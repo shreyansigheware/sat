@@ -140,7 +140,7 @@ td.d{font-family:var(--f-display);font-weight:600;font-size:14px}
   </div>
   <div class="rail-r">
     <span id="eyebrow"></span>
-    <span class="count"><b id="cur">1</b> / <span id="tot">9</span></span>
+    <span class="count"><b id="cur">1</b> / <span id="tot">11</span></span>
     <a class="hbtn" href="index.html">Syllabus</a>
     <button class="tbtn" id="theme">Theme</button>
   </div>
@@ -249,7 +249,7 @@ td.d{font-family:var(--f-display);font-weight:600;font-size:14px}
       <div class="card">
         <h3>5 · Tables and regression</h3>
         <p>Enter a data table, then fit a line with <span class="mono">y1 ~ mx1 + b</span>. Gives the line of best fit, its slope, and predicted values.</p>
-        <p>Turns most two-variable data questions into a lookup.</p>
+        <p>Turns most two-variable data questions into a lookup — and it is the doorway to the regression method on the next slide, which is a far bigger lever than best-fit lines.</p>
       </div>
       <div class="card">
         <h3>6 · Inequalities</h3>
@@ -258,7 +258,97 @@ td.d{font-family:var(--f-display);font-weight:600;font-size:14px}
     </div>
     <div class="call">
       <span class="lbl">When not to reach for it</span>
-      Questions that ask for an answer <b>in terms of <span class="mono">x</span></b>, equivalent-expression rewrites, and anything where typing takes longer than solving. <b>Desmos is for finding numbers, not for manipulating symbols.</b> Knowing which is which is part of the skill.
+      Questions that ask for an answer <b>in terms of <span class="mono">x</span></b>, symbolic simplification, and anything where typing takes longer than solving. <b>Desmos is for finding numbers, not for manipulating symbols.</b> One important exception: <em>"can be rewritten as"</em> and <em>"is equivalent to"</em>, when constants are involved, are regression questions — see the next two slides.
+    </div>
+  </div>
+</section>
+
+<!-- 3b -->
+<section class="slide" data-eyebrow="The Desmos playbook II &middot; regression as a solver">
+  <div class="inner">
+    <div class="kicker">Tooling &middot; the move that finishes the section early</div>
+    <h1 class="stitle">Regression is a solver, not a statistics tool.</h1>
+    <p class="sub">The six moves opposite handle questions that have a picture. This one handles the questions that don't: anything of the form <em>find the constants that make this true</em>. It is the single least-known high-scorer technique on the Math section, and it has real guardrails — used carelessly it returns confident nonsense.</p>
+    <div class="cards c3">
+      <div class="card">
+        <h3>1 &middot; The one keystroke</h3>
+        <p>Replace <span class="mono">=</span> with <span class="mono">~</span>. Desmos stops trying to graph the line and starts <b>solving for every letter that isn't x or y</b>, reporting each in the panel underneath.</p>
+        <div class="ex"><div><span class="n">=</span> graphs it &nbsp;→&nbsp; needs the constants known</div><div><span class="y">~</span> fits it &nbsp;→&nbsp; hands you the constants</div></div>
+      </div>
+      <div class="card">
+        <h3>2 &middot; Unknown constants in an identity</h3>
+        <p>The recurring set-up: an equation that must hold <b>for every value of x</b>, asking for <span class="mono">a</span>, <span class="mono">b</span> or their sum. Define a list, retype the equation in <span class="mono">x&#8321;</span>, and read the answer off.</p>
+        <div class="ex"><div class="a">x&#8321; = [2, 3, 5, 7, 11]</div><div class="a">a·x&#8321; + b ~ 4x&#8321; &minus; 9</div><div>→ panel reports a and b</div></div>
+      </div>
+      <div class="card">
+        <h3>3 &middot; Choose the list properly</h3>
+        <p>The values must be <b>distinct</b>, and must <b>avoid 0 and 1</b>. Those two satisfy far too many relationships by accident, and the constants that come back will fit nothing else.</p>
+        <p style="margin-top:11px">Small primes are the safe habit — nothing about them is accidentally true. <span class="mono">x&#8321; = random(10)</span> is the faster default and is safer still, since it cannot collide with the question's own numbers.</p>
+      </div>
+      <div class="card">
+        <h3>4 &middot; Enough values for the unknowns</h3>
+        <p>At least as many list values as constants being solved for. Fewer, and the fit is underdetermined and silently wrong.</p>
+        <p style="margin-top:11px"><b>One exception worth memorising:</b> standard form <span class="mono">ax + by = c</span> will not resolve this way however many points you supply. Rearrange to <span class="mono">y =</span> first.</p>
+      </div>
+      <div class="card">
+        <h3>5 &middot; Custom forms</h3>
+        <p>The built-in exponential fit assumes one shape. A printed form such as <span class="mono">a·b^(x&minus;c)</span> has to be typed out as its own regression.</p>
+        <p style="margin-top:11px">Skip that and the panel returns awkward decimals that look like an answer and are not one. <b>If the printed form isn't the fitted form, the numbers are meaningless.</b></p>
+      </div>
+      <div class="card">
+        <h3>6 &middot; Verify before trusting</h3>
+        <p><b>Regression returns numbers even when no solution exists.</b> It fits the closest thing it can find and reports it without complaint.</p>
+        <p style="margin-top:11px">Substitute the constants back and confirm both sides coincide. Note also that <b>no solutions</b> and <b>infinitely many</b> both display as an empty graph — that pair has to be told apart deliberately, never by eye.</p>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">Three things that silently break Desmos</span>
+      <b>Only lowercase <span class="mono">x</span> graphs.</b> A question phrased in <span class="mono">a</span> or <span class="mono">t</span> plots nothing at all — substitute, or attach a slider. &nbsp;<b>Angle mode is a trap:</b> check degrees against radians before any trigonometry, because the wrong mode returns a clean, plausible, wrong number. &nbsp;<b>A list needs brackets</b> when it sits outside a function, or Desmos cannot interpret it.
+    </div>
+  </div>
+</section>
+
+<!-- 3c -->
+<section class="slide" data-eyebrow="The Desmos playbook III &middot; the hard question types">
+  <div class="inner">
+    <div class="kicker">Tooling &middot; where the last 40 points live</div>
+    <h1 class="stitle">Six set-ups that look unsolvable and take thirty seconds.</h1>
+    <p class="sub">These are the recurring hard-module patterns. Each one is a fixed procedure, and each is worth rehearsing until the set-up is written before the question is fully read.</p>
+    <div class="cards c3">
+      <div class="card">
+        <h3>1 &middot; A function plus given points</h3>
+        <p><span class="mono">P(t) = c·d^t</span>, told <span class="mono">P(2)=48</span> and <span class="mono">P(5)=1296</span>, asked for <span class="mono">P(6)</span>. <b>Define the function on its own line first</b>, then register the points as a list on a separate line.</p>
+        <div class="ex"><div class="a">P(t) = c·d^t</div><div class="a">[P(2), P(5)] = [48, 1296]</div><div>→ then just type P(6)</div></div>
+      </div>
+      <div class="card">
+        <h3>2 &middot; Percent chains</h3>
+        <p>Three or four linked percentage statements ending in <em>"what is P?"</em>. Type each sentence in as its own line, literally, in the order printed, and read P off.</p>
+        <p style="margin-top:11px">A letter may be reused across lines as long as each statement relates it to <b>different</b> other letters. Doing this by hand is where the errors come from.</p>
+      </div>
+      <div class="card">
+        <h3>3 &middot; Fulfil the stated conditions</h3>
+        <p>When the question says <span class="mono">k &gt; m &gt; 47</span>, or <em>"p is an integer greater than 1"</em>, or <em>"n and k are positive"</em>, <b>pick concrete values that satisfy it</b> before reading anything off.</p>
+        <p style="margin-top:11px">Ignoring the condition is the single most common way these questions are lost — the panel still returns a number, and the number is wrong.</p>
+      </div>
+      <div class="card">
+        <h3>4 &middot; Integer conditions</h3>
+        <p>"...where <span class="mono">j</span> and <span class="mono">k</span> are positive integers" and the fit returns decimals. Step <span class="mono">j</span> through 1, 2, 3… until <b>both</b> come out whole.</p>
+        <p style="margin-top:11px">Usually exactly one value works, which is what makes the answer unique.</p>
+      </div>
+      <div class="card">
+        <h3>5 &middot; The dummy factor</h3>
+        <p>Told an expression <b>has a factor of</b> <span class="mono">kx + j</span>. A factor alone is not equivalent to the expression — multiply it by an invented second factor of matching shape, then fit.</p>
+        <div class="ex"><div class="a">(kx&#8321; + j)(dx&#8321; + z) ~ [the expression]</div><div>→ degrees and terms now match</div></div>
+      </div>
+      <div class="card">
+        <h3>6 &middot; Sliders to maximise</h3>
+        <p>"What is the <b>greatest possible value</b> of <span class="mono">ac</span>?" Fit as usual, add a slider to one constant, widen its bounds, and drag while watching the target value rise and turn over.</p>
+        <p style="margin-top:11px">The peak is the answer. Sliders are for optimising — for plain solving, a defined <span class="mono">x&#8321;</span> is faster and less fiddly.</p>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">The two errors that ruin regressions</span>
+      <b>Never write <span class="mono">f(x&#8321;)</span>.</b> It looks reasonable and does nothing useful — subscripting the argument of a defined function solves no question on this test. &nbsp;<b>Never put the function's own definition inside the regression line.</b> Define the function first, fit on a separate line. Both mistakes return output rather than an error, which is exactly why they cost points.
     </div>
   </div>
 </section>
@@ -353,7 +443,7 @@ td.d{font-family:var(--f-display);font-weight:600;font-size:14px}
         <ul class="tick">
           <li><b>Always check for extraneous solutions</b> after squaring both sides<small>The SAT includes the extraneous root among the choices</small></li>
           <li>A rational equation excludes any value making a denominator zero</li>
-          <li><b>Equivalent expressions must be done by hand</b> — factor, expand, difference of squares. Desmos cannot help here</li>
+          <li><b>Pure simplification is done by hand</b> — factor, expand, difference of squares<small>But "rewritten in the form … where a and b are constants" is a regression question, not a hand one</small></li>
         </ul>
       </div>
     </div>
@@ -503,7 +593,7 @@ td.d{font-family:var(--f-display);font-weight:600;font-size:14px}
     <p class="sub">Roughly 1½ hours a day on this section alongside the Reading &amp; Writing track — less time, because the content is already there. The work is precision and tooling.</p>
     <ol class="seq">
       <li><b>20–21 Aug · Baseline</b><span>Bluebook Practice Test 4, full length, timed, cold. Tag every Math miss with a cause, not a topic.</span></li>
-      <li class="big"><b>22–28 Aug · Desmos to fluency + algebra under time</b><span>All six Desmos moves until they are reflex — this is the single highest-return block. Alongside: 30 hard Question Bank items daily across Algebra and Advanced Math, every miss tagged.</span></li>
+      <li class="big"><b>22–28 Aug · Desmos to fluency + algebra under time</b><span>All six Desmos moves until they are reflex, then the regression layer — this is the single highest-return block. Alongside: 30 hard Question Bank items daily across Algebra and Advanced Math, every miss tagged.</span></li>
       <li><b>29 Aug · Practice Test 6</b><span>First real check on whether the Desmos work has converted into time saved.</span></li>
       <li><b>30 Aug – 4 Sep · The two small domains</b><span>Data &amp; statistics vocabulary and the not-on-the-reference-sheet formulas, to memory. Plus 20 grid-in format drills a day — pure mechanics.</span></li>
       <li><b>5 Sep · Practice Test 8</b></li>

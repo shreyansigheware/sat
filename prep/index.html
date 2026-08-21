@@ -13,7 +13,7 @@
   --ground:#F1F2EF; --surface:#FCFCFA; --raise:#E7E9E4;
   --ink:#14181A; --muted:#6A747A; --line:#D5D8D1;
   --accent:#2B3236; --on-accent:#FCFCFA;
-  --claret:#9B2C3E; --cobalt:#1E4DBD; --moss:#1F6B4A;
+  --claret:#9B2C3E; --cobalt:#1E4DBD; --moss:#1F6B4A; --plum:#6B3FA0;
   --warn:#8A6100; --good:#2F6B3A;
   --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
   --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
@@ -24,7 +24,7 @@
     --ground:#0E1113; --surface:#161A1C; --raise:#1E2326;
     --ink:#E9EBE6; --muted:#8D979C; --line:#282E32;
     --accent:#C6CFD3; --on-accent:#0E1113;
-    --claret:#F0899A; --cobalt:#89ADFF; --moss:#6ECFA0;
+    --claret:#F0899A; --cobalt:#89ADFF; --moss:#6ECFA0; --plum:#B69AE8;
     --warn:#E0B45E; --good:#7FC98F;
   }
 }
@@ -32,7 +32,7 @@
   --ground:#0E1113; --surface:#161A1C; --raise:#1E2326;
   --ink:#E9EBE6; --muted:#8D979C; --line:#282E32;
   --accent:#C6CFD3; --on-accent:#0E1113;
-  --claret:#F0899A; --cobalt:#89ADFF; --moss:#6ECFA0;
+  --claret:#F0899A; --cobalt:#89ADFF; --moss:#6ECFA0; --plum:#B69AE8;
   --warn:#E0B45E; --good:#7FC98F;
 }
 html{-webkit-text-size-adjust:100%}
@@ -109,6 +109,10 @@ td small{color:var(--muted);font-size:13px}
 .deck .go{margin-top:18px;font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;color:var(--ink);display:flex;align-items:center;gap:7px}
 .deck .go span{color:var(--dc)}
 .rw{--dc:var(--claret)} .mt{--dc:var(--cobalt)} .st{--dc:var(--moss)}
+.rs{--dc:var(--plum);grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 28px}
+.rs h3{margin-top:9px}
+.rs p{flex:1 1 340px;max-width:66ch;margin-top:10px}
+.rs .go{width:100%;margin-top:14px}
 
 /* notes */
 .notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px;margin-top:26px}
@@ -301,7 +305,7 @@ footer a{color:var(--muted)}
 <section>
   <div class="wrap">
     <span class="eyebrow">Prep decks</span>
-    <h2>Three decks</h2>
+    <h2>Three decks and a shortlist</h2>
     <div class="decks">
       <a class="deck rw" href="reading-writing.html">
         <div class="k">Section I</div>
@@ -312,14 +316,20 @@ footer a{color:var(--muted)}
       <a class="deck mt" href="math.html">
         <div class="k">Section II</div>
         <h3>Math Playbook</h3>
-        <p>The Desmos playbook, back-solving and picking numbers, the recurring algebra set-ups, statistics vocabulary, grid-in formatting rules, the careless-error audit, three-week protocol.</p>
-        <div class="go">9 slides <span>→</span></div>
+        <p>Three Desmos slides — the six core moves, regression as a universal solver, and the six hard set-ups — plus back-solving and picking numbers, the recurring algebra set-ups, statistics vocabulary, grid-in rules, the careless-error audit, three-week protocol.</p>
+        <div class="go">11 slides <span>→</span></div>
       </a>
       <a class="deck st" href="top-scorers.html">
         <div class="k">Cross-section</div>
         <h3>Top-Scorer Playbook</h3>
         <p>What separates 1500+ from 1400: the Module&nbsp;1 ceiling, the Bluebook toolkit, blind review, evidence from recent administrations, and the error-log discipline. Every claim carries a linked source.</p>
         <div class="go">10 slides · referenced <span>→</span></div>
+      </a>
+      <a class="deck rs" href="resources.html">
+        <div class="k">Materials</div>
+        <h3>Resource Shortlist</h3>
+        <p>Every resource checked and sorted by whether it moves a score in three weeks: the official core, three videos worth the time, the Desmos and AI layer, what to skip, and which tool answers which symptom.</p>
+        <div class="go">7 sections <span>→</span></div>
       </a>
     </div>
   </div>
@@ -329,6 +339,7 @@ footer a{color:var(--muted)}
   <div class="wrap">
     <span class="eyebrow">Materials — all free, all official</span>
     <h2>Use these and nothing else</h2>
+    <p class="lede">The full checked list — including what was deliberately left out — is in the <a href="resources.html" style="color:var(--plum)">Resource Shortlist</a>.</p>
     <div class="notes">
       <div class="note">
         <h4>Bluebook</h4>
