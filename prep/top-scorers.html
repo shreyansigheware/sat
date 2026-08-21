@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Top-Scorer Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --ground:#F1F2EF; --surface:#FCFCFA; --raise:#E8EAE5;
+  --ink:#14181A; --muted:#6A747A; --line:#D5D8D1;
+  --accent:#1F6B4A; --accent-soft:#1F6B4A14; --on-accent:#FCFCFA;
+  --warn:#8A6100; --bad:#9B2C3E;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1113; --surface:#161A1C; --raise:#1E2326;
+    --ink:#E9EBE6; --muted:#8D979C; --line:#282E32;
+    --accent:#6ECFA0; --accent-soft:#6ECFA01C; --on-accent:#0E1113;
+    --warn:#E0B45E; --bad:#F0899A;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1113; --surface:#161A1C; --raise:#1E2326;
+  --ink:#E9EBE6; --muted:#8D979C; --line:#282E32;
+  --accent:#6ECFA0; --accent-soft:#6ECFA01C; --on-accent:#0E1113;
+  --warn:#E0B45E; --bad:#F0899A;
+}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body);
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;overflow:hidden}
+h1,h2,h3,h4{font-family:var(--f-display);font-weight:600;margin:0;text-wrap:balance}
+.mono{font-family:var(--f-mono)}
+
+.rail{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:11px 26px;background:var(--surface);border-bottom:1px solid var(--line)}
+.rail-l{display:flex;align-items:baseline;gap:11px;min-width:0}
+.tag{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--on-accent);background:var(--accent);padding:3px 7px;border-radius:2px}
+.deckname{font-family:var(--f-display);font-weight:700;font-size:14px;letter-spacing:-.01em;white-space:nowrap}
+.rail-r{display:flex;align-items:center;gap:14px}
+#eyebrow{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:44vw}
+.count{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.count b{color:var(--ink);font-weight:500}
+.tbtn,.hbtn{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  background:none;border:1px solid var(--line);color:var(--muted);padding:4px 8px;cursor:pointer;border-radius:2px;text-decoration:none}
+.tbtn:hover,.hbtn:hover{color:var(--ink);border-color:var(--muted)}
+.tbtn:focus-visible,.hbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.prog{flex:0 0 auto;height:2px;background:var(--line)}
+.prog i{display:block;height:100%;background:var(--accent);width:0;transition:width .22s ease}
+
+#stage{flex:1 1 auto;overflow:hidden;display:flex}
+.slide{display:none;width:100%;overflow-y:auto;padding:34px 26px 26px}
+.slide.on{display:block}
+.inner{max-width:1180px;margin:0 auto}
+.stitle{font-size:clamp(25px,3.4vw,38px);letter-spacing:-.025em;line-height:1.05;max-width:23ch}
+.sub{color:var(--muted);margin:12px 0 0;max-width:76ch;font-size:16px}
+.kicker{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:11px}
+
+/* reference markers */
+sup.r{font-family:var(--f-mono);font-size:9.5px;line-height:0;vertical-align:super;white-space:nowrap}
+sup.r a{color:var(--accent);text-decoration:none;padding:0 1px;border-bottom:1px dotted var(--accent)}
+sup.r a:hover{background:var(--accent-soft)}
+sup.r a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);margin-top:24px}
+.strip div{background:var(--surface);padding:12px 14px}
+.strip .k{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.strip .v{font-family:var(--f-display);font-weight:600;font-size:19px;margin-top:5px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.strip .n{font-size:13px;color:var(--muted);margin-top:2px}
+
+.cards{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:24px}
+.c2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.c3{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+.card{background:var(--surface);padding:16px 18px 18px}
+.card>h3{font-size:15px;letter-spacing:-.01em}
+.card>h3 em{font-style:normal;font-family:var(--f-mono);font-size:11px;color:var(--muted);font-weight:400;margin-left:7px;letter-spacing:.05em}
+.card p{margin:9px 0 0}
+.card p+p{margin-top:7px}
+ul.tick{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+ul.tick li{padding-left:15px;position:relative;line-height:1.42}
+ul.tick li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:1px;background:var(--accent)}
+ul.tick li b{font-weight:600}
+ul.tick li small{display:block;color:var(--muted);font-size:13.5px;line-height:1.4}
+
+.tw{overflow-x:auto;margin-top:24px;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;min-width:620px;background:var(--surface)}
+th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14.5px}
+th{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--raise)}
+tbody tr:last-child td{border-bottom:none}
+td.m{font-family:var(--f-mono);font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.d{font-family:var(--f-display);font-weight:600;font-size:14px}
+td.n{font-family:var(--f-mono);font-size:12px;color:var(--accent);white-space:nowrap}
+.good{color:var(--accent)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+
+.ex{font-family:var(--f-mono);font-size:12px;line-height:1.7;background:var(--raise);
+  border:1px solid var(--line);padding:10px 12px;margin-top:10px;overflow-x:auto}
+.ex .y{color:var(--accent)} .ex .n{color:var(--bad)}
+.ex div{white-space:nowrap}
+
+.call{margin-top:24px;background:var(--accent-soft);border:1px solid var(--line);border-left:2px solid var(--accent);padding:14px 18px}
+.call b{font-weight:600}
+.call .lbl{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:6px}
+.call.caution{background:transparent;border-left-color:var(--warn)}
+.call.caution .lbl{color:var(--warn)}
+
+/* references list */
+ol.refs{margin:22px 0 0;padding:0;list-style:none;counter-reset:rr;display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
+ol.refs li{background:var(--surface);padding:11px 16px 12px 46px;position:relative;counter-increment:rr}
+ol.refs li::before{content:counter(rr);position:absolute;left:16px;top:12px;
+  font-family:var(--f-mono);font-size:11px;color:var(--accent)}
+ol.refs b{font-family:var(--f-display);font-weight:600;font-size:14px}
+ol.refs .what{color:var(--muted);font-size:14px;display:block;margin-top:2px}
+ol.refs a{font-family:var(--f-mono);font-size:11.5px;color:var(--accent);word-break:break-all;display:inline-block;margin-top:4px;text-decoration:none;border-bottom:1px dotted var(--accent)}
+ol.refs a:hover{background:var(--accent-soft)}
+ol.refs .off{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--line);padding:1px 5px;margin-left:8px;color:var(--muted);vertical-align:middle}
+ol.refs .off.o{color:var(--accent);border-color:var(--accent)}
+
+.nav{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:18px;position:relative;
+  padding:10px 26px;border-top:1px solid var(--line);background:var(--surface)}
+.nbtn{font-family:var(--f-mono);font-size:14px;background:none;border:1px solid var(--line);color:var(--ink);
+  width:34px;height:28px;cursor:pointer;border-radius:2px;line-height:1}
+.nbtn:hover{border-color:var(--accent);color:var(--accent)}
+.nbtn:disabled{opacity:.3;cursor:default;border-color:var(--line);color:var(--muted)}
+.nbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dots{display:flex;gap:6px}
+.dot{width:20px;height:3px;background:var(--line);border:none;padding:0;cursor:pointer;border-radius:1px}
+.dot:hover{background:var(--muted)}
+.dot.on{background:var(--accent)}
+.dot:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.hint{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;color:var(--muted);position:absolute;right:26px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:720px){
+  .slide{padding:22px 16px} .rail{padding:9px 14px} .nav{padding:9px 14px} .hint{display:none}
+  #eyebrow{display:none} table{min-width:520px}
+}
+</style>
+</head>
+<body>
+
+<div class="rail">
+  <div class="rail-l">
+    <span class="tag">Cross-section</span>
+    <span class="deckname">Top-Scorer Playbook</span>
+  </div>
+  <div class="rail-r">
+    <span id="eyebrow"></span>
+    <span class="count"><b id="cur">1</b> / <span id="tot">10</span></span>
+    <a class="hbtn" href="index.html">Syllabus</a>
+    <button class="tbtn" id="theme">Theme</button>
+  </div>
+</div>
+<div class="prog"><i id="progbar"></i></div>
+
+<main id="stage">
+
+<!-- 1 -->
+<section class="slide" data-eyebrow="The premise · what changes above 1450">
+  <div class="inner">
+    <div class="kicker">The premise</div>
+    <h1 class="stitle">Above 1450, the test stops being about what you know.</h1>
+    <p class="sub">Every strategy in this deck comes from the same finding: at the top of the scale you are not learning content, you are eliminating small repeatable mistakes.<sup class="r"><a href="https://collegeprep.uworld.com/blog/how-to-get-800-on-digital-sat-math/" target="_blank" rel="noopener" title="UWorld — How to get 800 on Digital SAT Math">5</a></sup> The March 2026 administration made the point plainly: an easier paper, and a harsher consequence for each slip.<sup class="r"><a href="https://ivytutorsnetwork.com/blog/march-14-2026-sat-difficulty-curve-breakdown" target="_blank" rel="noopener" title="Ivy Tutors — March 14 2026 SAT difficulty and curve breakdown">3</a></sup></p>
+    <div class="strip">
+      <div><div class="k">March 2026 · Math</div><div class="v">−1 ≈ 790–800</div><div class="n">Slightly easier paper → stricter scale</div></div>
+      <div><div class="k">March 2026 · R&amp;W</div><div class="v">−2 ≈ 760–780</div><div class="n">More forgiving scale</div></div>
+      <div><div class="k">Reported difficulty</div><div class="v">Reading</div><div class="n">Dense passages; the time squeeze</div></div>
+      <div><div class="k">The verdict</div><div class="v">Consistency</div><div class="n">Not difficulty, decides the score</div></div>
+    </div>
+    <div class="cards c3">
+      <div class="card">
+        <h3>What recent papers emphasised</h3>
+        <ul class="tick">
+          <li>Multi-step word problems in real-world settings<sup class="r"><a href="https://ivytutorsnetwork.com/blog/march-14-2026-sat-difficulty-curve-breakdown" target="_blank" rel="noopener">3</a></sup></li>
+          <li>Inference and tone rather than recall</li>
+          <li><b>Transition questions with several plausible answers</b></li>
+          <li>Geometry built on angle relationships</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>The counter-intuitive part</h3>
+        <p>An <b>easier</b> test is a more dangerous test. When more candidates score near the top, the scale tightens and a single careless error costs more than a hard question ever would.<sup class="r"><a href="https://ivytutorsnetwork.com/blog/march-14-2026-sat-difficulty-curve-breakdown" target="_blank" rel="noopener">3</a></sup></p>
+      </div>
+      <div class="card">
+        <h3>What that means for her</h3>
+        <p>With Maths 93 and English 97, the content is not the constraint. Everything in this deck is about <b>execution under a scale that punishes slips</b> — which is the good news, because execution is trainable in three weeks and content isn't.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-eyebrow="Rule one · Module 1 sets your ceiling">
+  <div class="inner">
+    <div class="kicker">The single most-cited principle</div>
+    <h1 class="stitle">A Module 1 mistake cannot be repaired later.</h1>
+    <p class="sub">Both sections route you to an easier or harder second module based on Module 1 accuracy. Being routed to the easy Module 2 <b>imposes a score ceiling that a perfect Module 2 cannot overcome</b>.<sup class="r"><a href="https://www.pathiva.com/sat-guide" target="_blank" rel="noopener" title="Pathiva — Digital SAT adaptive testing and prep strategy">8</a></sup> Perfect scorers therefore protect Module 1 accuracy above everything, including pace.<sup class="r"><a href="https://collegeprep.uworld.com/blog/how-to-get-800-on-digital-sat-math/" target="_blank" rel="noopener">5</a></sup></p>
+    <div class="cards c2">
+      <div class="card">
+        <h3>What high scorers do differently in Module 1</h3>
+        <ul class="tick">
+          <li><b>Spend the time.</b> Finishing Module 1 early buys nothing — the time does not carry over<small>There is no reward for speed in a module you have already answered</small></li>
+          <li><b>Verify the easy ones.</b> Perfect scorers slow down on questions they already know how to solve, because that is where 750s lose points<sup class="r"><a href="https://collegeprep.uworld.com/blog/how-to-get-800-on-digital-sat-math/" target="_blank" rel="noopener">5</a></sup></li>
+          <li><b>Re-read the stem before submitting</b> — the wrong-quantity error is invisible to recalculation</li>
+          <li>Flag liberally, and use the full review page before the module closes</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>The asymmetry, stated plainly</h3>
+        <div class="ex">
+          <div><span class="y">Module 1 error</span> → capped ceiling</div>
+          <div><span class="n">Module 2 error</span> → one question lost</div>
+        </div>
+        <p style="margin-top:11px">These are not the same mistake. A rushed Module 1 to "save time for the hard module" is the most expensive habit a strong student can bring to this test — and it is the habit that JEE-style pacing actively trains.</p>
+        <p><b>Unlearn it deliberately.</b> Practice tests are where that gets rewired, not test day.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-eyebrow="Materials · official only, newest last">
+  <div class="inner">
+    <div class="kicker">What top scorers practise on</div>
+    <h1 class="stitle">Official material only — and save the newest tests.</h1>
+    <div class="cards c3">
+      <div class="card">
+        <h3>Bluebook, tests 4–11 <em>free</em></h3>
+        <p>Eleven full-length adaptive tests, in the real interface.<sup class="r"><a href="https://www.strategictestprep.com/post/the-best-bluebook-sat-practice-tests-ranked-2026-update" target="_blank" rel="noopener" title="Strategic Test Prep — Bluebook practice tests ranked, 2026">4</a></sup> <b>Tests 1–3 were retired in Feb 2025 for being significantly easier than real administrations</b> — a useful warning about what unrepresentative practice does to a predicted score.</p>
+        <p><b>Test 11 most closely reflects what is being administered now.</b><sup class="r"><a href="https://www.strategictestprep.com/post/the-best-bluebook-sat-practice-tests-ranked-2026-update" target="_blank" rel="noopener">4</a></sup> Sequence accordingly: older tests early, newest ones last, when a realistic prediction actually matters.</p>
+      </div>
+      <div class="card">
+        <h3>Official Question Bank &amp; Khan Academy</h3>
+        <p>Retired real questions, filterable by domain and difficulty — the drilling tool. Khan Academy is the College Board partner course and generates targeted practice directly from Bluebook results.<sup class="r"><a href="https://satsuite.collegeboard.org/practice/practice-tests/bluebook" target="_blank" rel="noopener" title="College Board — Bluebook full-length practice tests">2</a></sup></p>
+        <p>Physical workbooks cannot reproduce adaptive routing, the interface tools or module pacing.<sup class="r"><a href="https://www.pathiva.com/sat-guide" target="_blank" rel="noopener">8</a></sup></p>
+      </div>
+      <div class="card">
+        <h3>The two third-party exceptions</h3>
+        <p>High scorers converge on the same two books, and only these two:<sup class="r"><a href="https://prepmaven.com/blog/test-prep/best-sat-prep-book/" target="_blank" rel="noopener" title="PrepMaven — best SAT prep books for the digital SAT">9</a></sup></p>
+        <ul class="tick">
+          <li><b>The College Panda's SAT Math</b><small>Written by a perfect scorer; aimed squarely at the 800</small></li>
+          <li><b>Erica Meltzer — Reading &amp; Writing</b><small>The grammar and rhetoric reference for advanced students</small></li>
+        </ul>
+        <p style="margin-top:11px">Everything else risks miscalibrating difficulty in both directions.</p>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">Applied to the 12 September plan</span>
+      Baseline on an older test, then work forward. <b>Practice Test 4 (baseline) → 6 → 8 → 11 as the final three-days-out test.</b> That way the most predictive paper is the last signal she gets before the real one.
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-eyebrow="The Bluebook toolkit · most students never switch these on">
+  <div class="inner">
+    <div class="kicker">Interface</div>
+    <h1 class="stitle">Six built-in tools. Turn them on from practice test one.</h1>
+    <p class="sub">All of these are inside the app on test day.<sup class="r"><a href="https://bluebook.collegeboard.org/students/tools" target="_blank" rel="noopener" title="College Board — Bluebook testing tools (official)">1</a></sup> The point of using them from the first practice test is that test day should contain <b>no novelty at all</b>.</p>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Tool</th><th>Where</th><th>How top scorers use it</th></tr></thead>
+        <tbody>
+          <tr><td class="d">Answer Eliminator</td><td class="m">ABC icon, struck through</td><td><b>Turn it on once and it stays on for the whole test.</b><sup class="r"><a href="https://bluebook.collegeboard.org/students/tools" target="_blank" rel="noopener">1</a></sup> Cross out as you read, so a re-check never re-reads a choice already killed</td></tr>
+          <tr><td class="d">Annotate / Highlight</td><td class="m">Highlighter icon</td><td>Highlight the claim in evidence questions and the goal in synthesis questions. Leave a note where a passage turns</td></tr>
+          <tr><td class="d">Line Reader</td><td class="m">Tools menu</td><td>Isolates one line at a time — useful on the dense reading passages that recent papers leaned on<sup class="r"><a href="https://ivytutorsnetwork.com/blog/march-14-2026-sat-difficulty-curve-breakdown" target="_blank" rel="noopener">3</a></sup></td></tr>
+          <tr><td class="d">Mark for Review</td><td class="m">Bookmark icon</td><td>Flag anything not <b>100%</b> certain — including questions you answered. This feeds the blind review on the next slide</td></tr>
+          <tr><td class="d">Timer</td><td class="m">Top of screen</td><td><b>Can be hidden until 5 minutes remain</b>, at which point it alerts you.<sup class="r"><a href="https://bluebook.collegeboard.org/students/tools" target="_blank" rel="noopener">1</a></sup> Many high scorers hide it to stop clock-watching, then check at fixed checkpoints</td></tr>
+          <tr><td class="d">Desmos + reference sheet</td><td class="m">Math section, always</td><td>Graphing calculator on every question; formula sheet permanently on screen</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="call">
+      <span class="lbl">Do this in week one</span>
+      Complete a full practice test with <b>every tool switched on and actually used</b>, even where it feels unnecessary. Tool fluency is worth more than the extra practice questions the same hour would buy.
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-eyebrow="Blind review · the 750-to-800 technique">
+  <div class="inner">
+    <div class="kicker">The technique that separates 750 from 800</div>
+    <h1 class="stitle">Flag everything you are not certain of — including what you got right.</h1>
+    <div class="cards c2">
+      <div class="card">
+        <h3>During the module</h3>
+        <ul class="tick">
+          <li>Answer every question — never leave a blank</li>
+          <li><b>Flag anything below 100% certainty</b>, even when you have chosen an answer you believe in</li>
+          <li>Keep moving. A stubborn question costs three easy ones</li>
+        </ul>
+        <h3 style="margin-top:18px">In the time you reserved</h3>
+        <ul class="tick">
+          <li><b>Redo each flagged question from scratch</b>, before looking at what you originally chose</li>
+          <li>If the fresh attempt disagrees with the first, that question was never actually solved — work it a third time</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Afterwards — the part almost everyone skips</h3>
+        <p>When reviewing a practice test, go through <b>every question you flagged and every question you got wrong</b> — so that even a question you guessed correctly gets reviewed.<sup class="r"><a href="https://blog.prepscholar.com/how-to-get-800-on-sat-math-by-a-perfect-scorer" target="_blank" rel="noopener" title="PrepScholar — How to get 800 on SAT Math, by a perfect scorer">7</a></sup></p>
+        <p>A right answer you were unsure of is <b>an unearned point</b>. It will not repeat. Under a scale where one raw mark is worth ten to twenty scaled points, those are exactly the questions that decide the sitting.<sup class="r"><a href="https://ivytutorsnetwork.com/blog/march-14-2026-sat-difficulty-curve-breakdown" target="_blank" rel="noopener">3</a></sup></p>
+        <div class="ex">
+          <div><span class="y">right + certain</span> → skip in review</div>
+          <div><span class="n">right + unsure</span> → review as if wrong</div>
+          <div><span class="n">wrong</span> → review, tag the cause</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-eyebrow="Math · the 800 discipline">
+  <div class="inner">
+    <div class="kicker">Math · what 800 scorers actually do</div>
+    <h1 class="stitle">Slow down on the easy ones. That is the whole technique.</h1>
+    <div class="cards c3">
+      <div class="card">
+        <h3>Where the points actually leak</h3>
+        <p>Students chasing an 800 lose marks by <b>rushing questions they already know how to solve</b>. Perfect scorers slow down just enough to confirm what is being asked — especially on the easy items.<sup class="r"><a href="https://collegeprep.uworld.com/blog/how-to-get-800-on-digital-sat-math/" target="_blank" rel="noopener">5</a></sup></p>
+        <p>Nobody reaches 780 and then fails to reach 800 because of a hard question. They fail because of an easy one.</p>
+      </div>
+      <div class="card">
+        <h3>Split the practice in two</h3>
+        <ul class="tick">
+          <li><b>Easy and medium</b> → Desmos and plugging in answers<sup class="r"><a href="https://thetestadvantage.com/blog/how-to-get-a-1550-on-the-sat-in-one-week-real-strategy" target="_blank" rel="noopener" title="The Test Advantage — real 1550 strategy">6</a></sup><small>Speed and certainty, not elegance</small></li>
+          <li><b>Hard</b> → learn the recurring patterns: quadratics, exponentials, circles<sup class="r"><a href="https://thetestadvantage.com/blog/how-to-get-a-1550-on-the-sat-in-one-week-real-strategy" target="_blank" rel="noopener">6</a></sup><small>Recognition, not derivation</small></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Desmos regression</h3>
+        <p>Practice Tests 5 and 6 introduced <b>regression-based Desmos questions</b>, now considered a required skill rather than a nice-to-have.<sup class="r"><a href="https://thetestadvantage.com/blog/how-to-get-a-1550-on-the-sat-in-one-week-real-strategy" target="_blank" rel="noopener">6</a></sup></p>
+        <div class="ex"><div>table → <span class="y">y1 ~ mx1 + b</span></div></div>
+        <p style="margin-top:11px">Know it cold before test day. Full Desmos technique is on slide 3 of the Math deck.<sup class="r"><a href="https://acely.com/sat-prep/desmos-cheat-sheet" target="_blank" rel="noopener" title="Acely — SAT Desmos cheat sheet 2026">10</a></sup></p>
+      </div>
+    </div>
+    <div class="call caution">
+      <span class="lbl">The counterweight</span>
+      Not every question wants Desmos. Solving without the calculator builds the intuition that tells you <b>which</b> questions want it — and typing a question in takes longer than solving it more often than students expect.<sup class="r"><a href="https://collegeprep.uworld.com/blog/how-to-get-800-on-digital-sat-math/" target="_blank" rel="noopener">5</a></sup>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-eyebrow="Reading &amp; Writing · the time squeeze">
+  <div class="inner">
+    <div class="kicker">Reading &amp; Writing · what breaks scores</div>
+    <h1 class="stitle">The section fails on time management, not comprehension.</h1>
+    <div class="cards c2">
+      <div class="card">
+        <h3>Three habits that recur in every account</h3>
+        <ul class="tick">
+          <li><b>Read the question stem first.</b> Passages are now 25–150 words, so the stem tells you what to look for before you spend the read<sup class="r"><a href="https://www.pathiva.com/sat-guide" target="_blank" rel="noopener">8</a></sup><small>A digital-first habit — it was bad advice on the old paper test with its long shared passages</small></li>
+          <li><b>Master the recurring question types.</b> Most questions fall into a small number of categories; mastering them covers roughly 80% of the section<sup class="r"><a href="https://thetestadvantage.com/blog/how-to-get-a-1550-on-the-sat-in-one-week-real-strategy" target="_blank" rel="noopener">6</a></sup></li>
+          <li><b>Skip hard questions deliberately.</b> Flag and return — treating every question as equally worth your time is what runs the clock out<sup class="r"><a href="https://thetestadvantage.com/blog/how-to-get-a-1550-on-the-sat-in-one-week-real-strategy" target="_blank" rel="noopener">6</a></sup></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Where recent papers turned hard</h3>
+        <ul class="tick">
+          <li><b>Dense passages needing careful interpretation</b> — the reported difficulty spike of March 2026, and specifically a time problem<sup class="r"><a href="https://ivytutorsnetwork.com/blog/march-14-2026-sat-difficulty-curve-breakdown" target="_blank" rel="noopener">3</a></sup></li>
+          <li><b>Transition questions with several seemingly correct answers</b><sup class="r"><a href="https://ivytutorsnetwork.com/blog/march-14-2026-sat-difficulty-curve-breakdown" target="_blank" rel="noopener">3</a></sup><small>Exactly why the R&amp;W deck insists on naming the relationship before reading the choices</small></li>
+          <li>Writing was standard difficulty — it rewarded <b>precision, not advanced knowledge</b><sup class="r"><a href="https://ivytutorsnetwork.com/blog/march-14-2026-sat-difficulty-curve-breakdown" target="_blank" rel="noopener">3</a></sup><small>Which is the argument for front-loading the grammar rules</small></li>
+        </ul>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">The one place R&amp;W is kinder than Math</span>
+      Recent scales suggest R&amp;W forgives more — around <b>−2 raw still landing 760–780</b>, against Math where <b>−1 already costs you the 800</b>.<sup class="r"><a href="https://ivytutorsnetwork.com/blog/march-14-2026-sat-difficulty-curve-breakdown" target="_blank" rel="noopener">3</a></sup> If time has to be traded between sections in the final week, Math precision is worth more per hour.
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-eyebrow="The error log · patterns, not questions">
+  <div class="inner">
+    <div class="kicker">The habit every account names first</div>
+    <h1 class="stitle">Log mistakes to find the pattern, not to collect the questions.</h1>
+    <p class="sub">The error log is described as the single most powerful score-improvement tool: record every mistake after each session, then <b>review the log weekly to spot patterns</b>.<sup class="r"><a href="https://www.strategictestprep.com/post/the-best-bluebook-sat-practice-tests-ranked-2026-update" target="_blank" rel="noopener">4</a></sup> The point is not the list. The point is the repeated cause the list exposes.</p>
+    <div class="cards c2">
+      <div class="card">
+        <h3>The patterns that actually turn up</h3>
+        <ul class="tick">
+          <li><b>Rushing Module 1</b><sup class="r"><a href="https://www.strategictestprep.com/post/the-best-bluebook-sat-practice-tests-ranked-2026-update" target="_blank" rel="noopener">4</a></sup><small>The most expensive one, and the hardest to feel in the moment</small></li>
+          <li><b>Misreading question stems</b><sup class="r"><a href="https://www.strategictestprep.com/post/the-best-bluebook-sat-practice-tests-ranked-2026-update" target="_blank" rel="noopener">4</a></sup><small>Solved for x, the question wanted 2x</small></li>
+          <li><b>Consistently missing inference questions</b><sup class="r"><a href="https://www.strategictestprep.com/post/the-best-bluebook-sat-practice-tests-ranked-2026-update" target="_blank" rel="noopener">4</a></sup><small>A content pattern, and the one that needs drilling rather than a checking rule</small></li>
+        </ul>
+        <p style="margin-top:14px">Once a pattern is named, it gets a targeted drill or a written checking rule — <b>not more mixed practice</b>.</p>
+      </div>
+      <div class="card">
+        <h3>The log format</h3>
+        <div class="ex">
+          <div><span class="y">question</span> · test &amp; number</div>
+          <div><span class="y">domain</span> · which skill</div>
+          <div><span class="y">cause</span> · rule gap / misread /</div>
+          <div>&nbsp;&nbsp;careless / timing / format</div>
+          <div><span class="y">redo</span> · date + 48h</div>
+        </div>
+        <p style="margin-top:11px"><b>Cause is the only column that matters.</b> A log of topics tells you what to revise, which for a student with Maths 93 is nothing. A log of causes tells you what to change, which is everything.</p>
+        <p>Weekly, not daily: patterns need volume before they are visible.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-eyebrow="Test day · operating rules">
+  <div class="inner">
+    <div class="kicker">Operating rules</div>
+    <h1 class="stitle">Rehearse the conditions, not just the questions.</h1>
+    <div class="cards c3">
+      <div class="card">
+        <h3>Before the day</h3>
+        <ul class="tick">
+          <li>Take practice tests at the <b>real start time</b>, not late at night<small>Peak alertness is trainable and specific to the hour</small></li>
+          <li>Last full-length test <b>three days out</b> — late enough to be diagnostic, early enough to act on</li>
+          <li><b>Complete Bluebook exam setup in advance.</b> It opens in the days before and skipping it can cost the sitting<sup class="r"><a href="https://satsuite.collegeboard.org/practice/bluebook" target="_blank" rel="noopener" title="College Board — how to use Bluebook practice tests">2</a></sup></li>
+          <li>Passport, printed admission ticket, charged device and charger</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>During</h3>
+        <ul class="tick">
+          <li>Answer Eliminator on, at the first question<sup class="r"><a href="https://bluebook.collegeboard.org/students/tools" target="_blank" rel="noopener">1</a></sup></li>
+          <li><b>Hide the timer</b>; check at fixed checkpoints instead of continuously<sup class="r"><a href="https://bluebook.collegeboard.org/students/tools" target="_blank" rel="noopener">1</a></sup></li>
+          <li>Protect Module 1 accuracy over pace, in both sections</li>
+          <li>Never a blank. Flag, guess, move</li>
+          <li>Reserve time to <b>re-read stems</b>, not to recalculate</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>The 10-minute break</h3>
+        <p>It sits between the two sections. Eat something, stand up, do not review anything.</p>
+        <p>Math follows the break — the section where a single slip is most expensive. Arriving at it flat is a scoring decision, not a comfort one.</p>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">One sitting is not the plan</span>
+      Most 1500+ outcomes are built across <b>two or three sittings with superscoring</b>. 12 September is the diagnostic under real conditions; 3 October and 7 November are where the score is made. Registering for 3 October by <b>18 September</b> matters, because the 12 September result does not arrive until 25 September.
+    </div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-eyebrow="References · sources and how far to trust them">
+  <div class="inner">
+    <div class="kicker">References</div>
+    <h1 class="stitle">Sources, and what each one actually supports.</h1>
+    <ol class="refs">
+      <li><b>College Board — Bluebook Testing Tools</b><span class="off o">Official</span><span class="what">The authority for every tool on slide 4: Answer Eliminator behaviour, annotation, line reader, Mark for Review, and the hide-timer-until-5-minutes feature.</span><a href="https://bluebook.collegeboard.org/students/tools" target="_blank" rel="noopener">bluebook.collegeboard.org/students/tools</a></li>
+      <li><b>College Board — Bluebook Full-Length Practice Tests</b><span class="off o">Official</span><span class="what">Confirms what Bluebook practice tests are, that they are free and adaptive, and how results feed Khan Academy targeted practice.</span><a href="https://satsuite.collegeboard.org/practice/practice-tests/bluebook" target="_blank" rel="noopener">satsuite.collegeboard.org/practice/practice-tests/bluebook</a></li>
+      <li><b>Ivy Tutors Network — March 14, 2026 SAT breakdown</b><span class="off">Third-party</span><span class="what">The recent-administration evidence: section difficulty, question-type emphasis, and the estimated scales (Math −1 ≈ 790–800, R&amp;W −2 ≈ 760–780). <b>Note:</b> College Board does not publish curves — these are reconstructions from reported scores and should be read as directional, not exact.</span><a href="https://ivytutorsnetwork.com/blog/march-14-2026-sat-difficulty-curve-breakdown" target="_blank" rel="noopener">ivytutorsnetwork.com/blog/march-14-2026-sat-difficulty-curve-breakdown</a></li>
+      <li><b>Strategic Test Prep — Bluebook practice tests ranked (2026)</b><span class="off">Third-party</span><span class="what">Source for tests 4–11 being current, tests 1–3 retired in Feb 2025 as unrepresentatively easy, Test 11 best reflecting current administrations, and the error-log pattern list.</span><a href="https://www.strategictestprep.com/post/the-best-bluebook-sat-practice-tests-ranked-2026-update" target="_blank" rel="noopener">strategictestprep.com/post/the-best-bluebook-sat-practice-tests-ranked-2026-update</a></li>
+      <li><b>UWorld — How to get 800 on Digital SAT Math</b><span class="off">Third-party</span><span class="what">The core 750→800 argument: eliminate repeatable mistakes rather than learn content; slow down on easy questions; protect Module 1 accuracy; and the caution against over-using Desmos.</span><a href="https://collegeprep.uworld.com/blog/how-to-get-800-on-digital-sat-math/" target="_blank" rel="noopener">collegeprep.uworld.com/blog/how-to-get-800-on-digital-sat-math/</a></li>
+      <li><b>The Test Advantage — real 1550 strategy</b><span class="off">Third-party</span><span class="what">Splitting Math practice into easy/medium versus hard; Desmos regression questions appearing in Tests 5 and 6; the R&amp;W habits — question first, master the recurring types, skip deliberately.</span><a href="https://thetestadvantage.com/blog/how-to-get-a-1550-on-the-sat-in-one-week-real-strategy" target="_blank" rel="noopener">thetestadvantage.com/blog/how-to-get-a-1550-on-the-sat-in-one-week-real-strategy</a></li>
+      <li><b>PrepScholar — How to get 800 on SAT Math, by a perfect scorer</b><span class="off">Third-party</span><span class="what">The blind-review discipline: review every question you marked as well as every one you got wrong, so questions guessed correctly still get reviewed.</span><a href="https://blog.prepscholar.com/how-to-get-800-on-sat-math-by-a-perfect-scorer" target="_blank" rel="noopener">blog.prepscholar.com/how-to-get-800-on-sat-math-by-a-perfect-scorer</a></li>
+      <li><b>Pathiva — Digital SAT adaptive testing &amp; prep strategy</b><span class="off">Third-party</span><span class="what">The Module 1 ceiling argument stated explicitly, the 25–150 word single-question passage format, and why physical workbooks cannot reproduce adaptive routing.</span><a href="https://www.pathiva.com/sat-guide" target="_blank" rel="noopener">pathiva.com/sat-guide</a></li>
+      <li><b>PrepMaven — Best SAT prep books for the digital SAT</b><span class="off">Third-party</span><span class="what">The two third-party books high scorers converge on: College Panda for Math, Erica Meltzer for Reading &amp; Writing.</span><a href="https://prepmaven.com/blog/test-prep/best-sat-prep-book/" target="_blank" rel="noopener">prepmaven.com/blog/test-prep/best-sat-prep-book/</a></li>
+      <li><b>Acely — SAT Desmos cheat sheet (2026)</b><span class="off">Third-party</span><span class="what">Supplementary Desmos technique, including regression syntax. Cross-check anything here against the Math deck before relying on it.</span><a href="https://acely.com/sat-prep/desmos-cheat-sheet" target="_blank" rel="noopener">acely.com/sat-prep/desmos-cheat-sheet</a></li>
+    </ol>
+    <div class="call caution">
+      <span class="lbl">How to read these</span>
+      Sources 1–2 are College Board's own documentation and can be treated as fact. Sources 3–10 are test-prep analyses and aggregated high-scorer reports — reliable on <b>technique</b>, directional on <b>numbers</b>. Where a scale or curve figure appears in this deck it is an estimate reconstructed by tutors, not published data. Verified 21 August 2026; re-check the Bluebook practice-test count before the sitting, since College Board adds tests during the year.
+    </div>
+  </div>
+</section>
+
+</main>
+
+<nav class="nav">
+  <button class="nbtn" id="prev" aria-label="Previous slide">←</button>
+  <div class="dots" id="dots"></div>
+  <button class="nbtn" id="next" aria-label="Next slide">→</button>
+  <span class="hint">← → to navigate</span>
+</nav>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var dots=document.getElementById('dots'), i=0;
+  document.getElementById('tot').textContent=slides.length;
+  slides.forEach(function(s,n){
+    var b=document.createElement('button');
+    b.className='dot'; b.setAttribute('aria-label','Slide '+(n+1));
+    b.addEventListener('click',function(){go(n)});
+    dots.appendChild(b);
+  });
+  function go(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i); if(k===i)s.scrollTop=0;});
+    [].slice.call(dots.children).forEach(function(d,k){d.classList.toggle('on',k===i)});
+    document.getElementById('cur').textContent=i+1;
+    document.getElementById('eyebrow').textContent=slides[i].getAttribute('data-eyebrow')||'';
+    document.getElementById('progbar').style.width=((i+1)/slides.length*100)+'%';
+    document.getElementById('prev').disabled=(i===0);
+    document.getElementById('next').disabled=(i===slides.length-1);
+    history.replaceState(null,'','#'+(i+1));
+  }
+  document.getElementById('prev').addEventListener('click',function(){go(i-1)});
+  document.getElementById('next').addEventListener('click',function(){go(i+1)});
+  window.addEventListener('keydown',function(e){
+    if(e.target && e.target.tagName==='A') return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();go(i+1)}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1)}
+    else if(e.key==='Home'){e.preventDefault();go(0)}
+    else if(e.key==='End'){e.preventDefault();go(slides.length-1)}
+  });
+  document.getElementById('theme').addEventListener('click',function(){
+    var cur=document.documentElement.getAttribute('data-theme');
+    var sys=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+    var now=cur||sys;
+    document.documentElement.setAttribute('data-theme', now==='dark'?'light':'dark');
+  });
+  window.addEventListener('hashchange',function(){
+    var n=(parseInt(location.hash.slice(1),10)||1)-1;
+    if(n!==i) go(n);
+  });
+  go((parseInt(location.hash.slice(1),10)||1)-1);
+})();
+</script>
+</body>
+</html>

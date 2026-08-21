@@ -1,0 +1,34 @@
+# ── OS & editor ───────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*~
+*.swp
+.vscode/
+.idea/
+
+# ── Claude Code (machine-local, not shared) ───────────────────
+.claude/settings.local.json
+
+# ── Secrets ───────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── Personal documents ────────────────────────────────────────
+# This repo sits inside ~/shreya, which holds ID and exam records.
+# Anything sensitive goes in private/ and never leaves the machine.
+private/
+*aadhaar*
+*aadhar*
+*-selfsigned.pdf
+*marksheet*
+*scorecard*
+*admit-card*
+
+# ── Scratch & build ───────────────────────────────────────────
+tmp/
+scratch/
+node_modules/
+*.log

@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Math Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --ground:#F1F2EF; --surface:#FCFCFA; --raise:#E8EAE5;
+  --ink:#14181A; --muted:#6A747A; --line:#D5D8D1;
+  --accent:#1E4DBD; --accent-soft:#1E4DBD12; --on-accent:#FCFCFA;
+  --warn:#8A6100; --good:#2F6B3A;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1113; --surface:#161A1C; --raise:#1E2326;
+    --ink:#E9EBE6; --muted:#8D979C; --line:#282E32;
+    --accent:#89ADFF; --accent-soft:#89ADFF1C; --on-accent:#0E1113;
+    --warn:#E0B45E; --good:#7FC98F;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1113; --surface:#161A1C; --raise:#1E2326;
+  --ink:#E9EBE6; --muted:#8D979C; --line:#282E32;
+  --accent:#89ADFF; --accent-soft:#89ADFF1C; --on-accent:#0E1113;
+  --warn:#E0B45E; --good:#7FC98F;
+}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body);
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;overflow:hidden}
+h1,h2,h3,h4{font-family:var(--f-display);font-weight:600;margin:0;text-wrap:balance}
+.mono{font-family:var(--f-mono)}
+
+.rail{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:11px 26px;background:var(--surface);border-bottom:1px solid var(--line)}
+.rail-l{display:flex;align-items:baseline;gap:11px;min-width:0}
+.tag{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--on-accent);background:var(--accent);padding:3px 7px;border-radius:2px}
+.deckname{font-family:var(--f-display);font-weight:700;font-size:14px;letter-spacing:-.01em;white-space:nowrap}
+.rail-r{display:flex;align-items:center;gap:14px}
+#eyebrow{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+.count{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.count b{color:var(--ink);font-weight:500}
+.tbtn,.hbtn{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  background:none;border:1px solid var(--line);color:var(--muted);padding:4px 8px;cursor:pointer;border-radius:2px;text-decoration:none}
+.tbtn:hover,.hbtn:hover{color:var(--ink);border-color:var(--muted)}
+.tbtn:focus-visible,.hbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.prog{flex:0 0 auto;height:2px;background:var(--line)}
+.prog i{display:block;height:100%;background:var(--accent);width:0;transition:width .22s ease}
+
+#stage{flex:1 1 auto;overflow:hidden;display:flex}
+.slide{display:none;width:100%;overflow-y:auto;padding:34px 26px 26px}
+.slide.on{display:block}
+.inner{max-width:1180px;margin:0 auto}
+.stitle{font-size:clamp(25px,3.4vw,38px);letter-spacing:-.025em;line-height:1.05;max-width:22ch}
+.sub{color:var(--muted);margin:12px 0 0;max-width:76ch;font-size:16px}
+.kicker{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:11px}
+
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);margin-top:24px}
+.strip div{background:var(--surface);padding:12px 14px}
+.strip .k{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.strip .v{font-family:var(--f-display);font-weight:600;font-size:19px;margin-top:5px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+
+.cards{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:24px}
+.c2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.c3{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+.card{background:var(--surface);padding:16px 18px 18px}
+.card>h3{font-size:15px;letter-spacing:-.01em}
+.card>h3 em{font-style:normal;font-family:var(--f-mono);font-size:11px;color:var(--muted);font-weight:400;margin-left:7px;letter-spacing:.05em}
+.card p{margin:9px 0 0}
+.card p+p{margin-top:7px}
+ul.tick{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+ul.tick li{padding-left:15px;position:relative;line-height:1.42}
+ul.tick li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:1px;background:var(--accent)}
+ul.tick li b{font-weight:600}
+ul.tick li small{display:block;color:var(--muted);font-size:13.5px;line-height:1.4}
+
+ol.seq{margin:22px 0 0;padding:0;list-style:none;counter-reset:s;display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
+ol.seq li{background:var(--surface);padding:12px 16px 13px 52px;position:relative;counter-increment:s}
+ol.seq li::before{content:counter(s,decimal-leading-zero);position:absolute;left:16px;top:13px;
+  font-family:var(--f-mono);font-size:11px;color:var(--accent);letter-spacing:.05em}
+ol.seq li b{font-family:var(--f-display);font-weight:600;font-size:14px;display:block;letter-spacing:-.01em}
+ol.seq li span{color:var(--muted);display:block;margin-top:3px;font-size:14.5px}
+ol.seq li.big{background:var(--accent-soft)}
+
+.tw{overflow-x:auto;margin-top:24px;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;min-width:620px;background:var(--surface)}
+th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14.5px}
+th{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--raise)}
+tbody tr:last-child td{border-bottom:none}
+td.m{font-family:var(--f-mono);font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.d{font-family:var(--f-display);font-weight:600;font-size:14px}
+.good{color:var(--good)} .warn{color:var(--warn)} .acc{color:var(--accent)}
+
+.ex{font-family:var(--f-mono);font-size:12px;line-height:1.7;background:var(--raise);
+  border:1px solid var(--line);padding:10px 12px;margin-top:10px;overflow-x:auto}
+.ex .y{color:var(--good)} .ex .n{color:var(--warn)} .ex .a{color:var(--accent)}
+.ex div{white-space:nowrap}
+
+.call{margin-top:24px;background:var(--accent-soft);border:1px solid var(--line);border-left:2px solid var(--accent);padding:14px 18px}
+.call b{font-weight:600}
+.call .lbl{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:6px}
+
+.nav{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:18px;position:relative;
+  padding:10px 26px;border-top:1px solid var(--line);background:var(--surface)}
+.nbtn{font-family:var(--f-mono);font-size:14px;background:none;border:1px solid var(--line);color:var(--ink);
+  width:34px;height:28px;cursor:pointer;border-radius:2px;line-height:1}
+.nbtn:hover{border-color:var(--accent);color:var(--accent)}
+.nbtn:disabled{opacity:.3;cursor:default;border-color:var(--line);color:var(--muted)}
+.nbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dots{display:flex;gap:6px}
+.dot{width:22px;height:3px;background:var(--line);border:none;padding:0;cursor:pointer;border-radius:1px}
+.dot:hover{background:var(--muted)}
+.dot.on{background:var(--accent)}
+.dot:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.hint{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;color:var(--muted);position:absolute;right:26px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:720px){
+  .slide{padding:22px 16px} .rail{padding:9px 14px} .nav{padding:9px 14px} .hint{display:none}
+  #eyebrow{display:none} table{min-width:520px}
+}
+</style>
+</head>
+<body>
+
+<div class="rail">
+  <div class="rail-l">
+    <span class="tag">Section II</span>
+    <span class="deckname">Math Playbook</span>
+  </div>
+  <div class="rail-r">
+    <span id="eyebrow"></span>
+    <span class="count"><b id="cur">1</b> / <span id="tot">9</span></span>
+    <a class="hbtn" href="index.html">Syllabus</a>
+    <button class="tbtn" id="theme">Theme</button>
+  </div>
+</div>
+<div class="prog"><i id="progbar"></i></div>
+
+<main id="stage">
+
+<!-- 1 -->
+<section class="slide" data-eyebrow="Overview · the shape of the section">
+  <div class="inner">
+    <div class="kicker">Overview</div>
+    <h1 class="stitle">The content is below your level. The format is not.</h1>
+    <p class="sub">Nothing on this section sits above Class XII PCM. With Maths 93 and Computer Science 92, essentially none of the loss here will be a knowledge gap — it will be misreading, unit slips, sign errors and grid-in formatting. Prep for precision, not for theory.</p>
+    <div class="strip">
+      <div><div class="k">Questions</div><div class="v">44</div></div>
+      <div><div class="k">Time</div><div class="v">70 min</div></div>
+      <div><div class="k">Structure</div><div class="v">2 × 22</div></div>
+      <div><div class="k">Per module</div><div class="v">35 min</div></div>
+      <div><div class="k">Per question</div><div class="v">~95 s</div></div>
+      <div><div class="k">Grid-ins</div><div class="v">~11</div></div>
+    </div>
+    <div class="cards c3">
+      <div class="card">
+        <h3>Desmos on every question</h3>
+        <p>A full graphing calculator is built into Bluebook and permitted throughout. Most students never learn to use it properly — that is the largest single lever in this section.</p>
+      </div>
+      <div class="card">
+        <h3>Reference sheet always on screen</h3>
+        <p>Areas, volumes, Pythagoras, special right triangles, degrees and radians. Nothing on it needs memorising. Everything <b>not</b> on it does.</p>
+      </div>
+      <div class="card">
+        <h3>Module 1 is the gate</h3>
+        <p>Accuracy on the first module decides whether the second is the harder form, and only the harder form reaches 800. Never sacrifice Module 1 accuracy for speed.</p>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">Target</span>
+      <b>780+.</b> Set the goal this way: anything below is a precision problem, not a mathematics problem — and precision problems have a fix.
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-eyebrow="Domain map · 70% is algebra">
+  <div class="inner">
+    <div class="kicker">Domain map</div>
+    <h1 class="stitle">Seventy per cent of the section is pure execution.</h1>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Domain</th><th>Q</th><th>Share</th><th>Contents</th><th>Your position</th></tr></thead>
+        <tbody>
+          <tr><td class="d">Algebra</td><td class="m">13–15</td><td class="m">35%</td><td>Linear equations in one and two variables; linear functions; systems of two linear equations; linear inequalities</td><td class="d good">Known — guard at 100%</td></tr>
+          <tr><td class="d">Advanced Math</td><td class="m">13–15</td><td class="m">35%</td><td>Equivalent expressions; nonlinear equations and systems; quadratic, exponential, polynomial, radical and rational functions</td><td class="d good">Known — plus a short list of set-ups</td></tr>
+          <tr><td class="d">Problem-Solving &amp; Data Analysis</td><td class="m">5–7</td><td class="m">15%</td><td>Ratios, rates, units, percentages; centre and spread; scatterplots; probability; margin of error; study design</td><td class="d warn">Vocabulary gap, not a maths gap</td></tr>
+          <tr><td class="d">Geometry &amp; Trigonometry</td><td class="m">5–7</td><td class="m">15%</td><td>Area and volume; lines, angles and triangles; right triangles and trigonometry; circles</td><td class="d warn">Small — one missing formula costs a whole question</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="cards c2">
+      <div class="card">
+        <h3>What this implies for three weeks</h3>
+        <ul class="tick">
+          <li><b>Do not re-teach algebra.</b> Drill it under time, and audit every miss for cause<small>Content revision here is wasted time</small></li>
+          <li><b>Learn Desmos properly in week one</b><small>It converts a large fraction of Advanced Math into reading a graph</small></li>
+          <li><b>Treat the two small domains as memorisation</b><small>12 questions between them, and they turn on knowing specific vocabulary and formulas</small></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>The counter-intuitive risk</h3>
+        <p>Strong mathematicians lose more points to <b>speed than to difficulty</b>. Confidence in the content produces skimmed question stems — answering for <span class="mono">x</span> when the question asked for <span class="mono">2x</span>, or for the cost per unit when it asked for the total.</p>
+        <p>The audit on slide 8 exists specifically for this, and it is the single most important habit in the Math track.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-eyebrow="The Desmos playbook · the biggest lever">
+  <div class="inner">
+    <div class="kicker">Tooling</div>
+    <h1 class="stitle">Six Desmos moves that turn algebra into looking at a picture.</h1>
+    <p class="sub">These take about two days to make reflexive and they pay for themselves on every practice test afterwards. Learn them in week one, before anything else.</p>
+    <div class="cards c3">
+      <div class="card">
+        <h3>1 · Solve anything</h3>
+        <p>Type the equation exactly as printed. Desmos plots both sides and marks the intersection — click it to read the solution.</p>
+        <div class="ex"><div class="a">3x + 7 = x² − 5</div><div>→ click the grey intersection dots</div></div>
+        <p style="margin-top:11px">Works for quadratics, exponentials, absolute value and radicals identically.</p>
+      </div>
+      <div class="card">
+        <h3>2 · Systems</h3>
+        <p>Type both equations on separate lines; the intersection is the solution. Faster and far safer than elimination under time pressure.</p>
+        <p>It also answers <b>how many</b> solutions at a glance — no intersection, one, or a line lying on top of a line.</p>
+      </div>
+      <div class="card">
+        <h3>3 · Roots, vertex, intercepts</h3>
+        <p>Type the function; Desmos labels zeros, minima, maxima and both intercepts as clickable points with exact coordinates.</p>
+        <p>Every "what is the minimum value of the function" question becomes a click.</p>
+      </div>
+      <div class="card">
+        <h3>4 · Sliders for unknown constants</h3>
+        <p>The hardest recurring set-up: <span class="mono">"for what value of k does the system have exactly one solution?"</span></p>
+        <div class="ex"><div class="a">y = x² + kx + 9</div><div>y = 3</div><div>→ add slider for k, drag until tangent</div></div>
+      </div>
+      <div class="card">
+        <h3>5 · Tables and regression</h3>
+        <p>Enter a data table, then fit a line with <span class="mono">y1 ~ mx1 + b</span>. Gives the line of best fit, its slope, and predicted values.</p>
+        <p>Turns most two-variable data questions into a lookup.</p>
+      </div>
+      <div class="card">
+        <h3>6 · Inequalities</h3>
+        <p>Type with <span class="mono">&lt;</span> or <span class="mono">&gt;</span> and Desmos shades the region. "Which point satisfies both inequalities" becomes visual.</p>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">When not to reach for it</span>
+      Questions that ask for an answer <b>in terms of <span class="mono">x</span></b>, equivalent-expression rewrites, and anything where typing takes longer than solving. <b>Desmos is for finding numbers, not for manipulating symbols.</b> Knowing which is which is part of the skill.
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-eyebrow="Working the answer choices">
+  <div class="inner">
+    <div class="kicker">Technique</div>
+    <h1 class="stitle">When the algebra is ugly, use the choices.</h1>
+    <div class="cards c2">
+      <div class="card">
+        <h3>Back-solve <em>numbers in the choices</em></h3>
+        <p>When the four choices are plain numbers and the question asks for a value, test one instead of solving.</p>
+        <ul class="tick">
+          <li><b>Start with B or C.</b> Choices are printed in ascending order, so one test usually tells you which direction to go<small>Often resolves in two attempts rather than four</small></li>
+          <li>Best on: awkward word-problem set-ups, "which value satisfies", systems with unpleasant coefficients</li>
+          <li>It converts an algebra problem into arithmetic, which is far harder to get wrong under time</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Pick numbers <em>variables in the choices</em></h3>
+        <p>When the answer choices contain letters, substitute your own value.</p>
+        <ul class="tick">
+          <li>Choose small and safe — <b>avoid 0 and 1</b>, and avoid any number already in the problem<small>They make different choices agree by accident</small></li>
+          <li>Compute the target value, then test <b>all four</b> choices<small>If two survive, run a second number — do not guess between them</small></li>
+          <li>For percentage questions, start from <b>100</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">The discipline</span>
+      Both techniques cost time. Use them when the direct route isn't visible within about <b>fifteen seconds</b> — not as a default. A strong algebra student who back-solves everything will run out of clock in Module 2.
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-eyebrow="Algebra &amp; Advanced Math · the recurring set-ups">
+  <div class="inner">
+    <div class="kicker">Algebra + Advanced Math · 26–30 Q</div>
+    <h1 class="stitle">The six things that actually recur.</h1>
+    <p class="sub">Not a syllabus — a list of the specific configurations the SAT builds questions from, year after year. Recognising the set-up is most of the work.</p>
+    <div class="cards c3">
+      <div class="card">
+        <h3>Solution counts of a linear system</h3>
+        <div class="ex">
+          <div>m₁ = m₂, b₁ ≠ b₂ → <span class="n">no solution</span></div>
+          <div>m₁ = m₂, b₁ = b₂ → <span class="a">infinite</span></div>
+          <div>m₁ ≠ m₂ → <span class="y">exactly one</span></div>
+        </div>
+        <p style="margin-top:11px">In <span class="mono">ax + by = c</span> form, compare ratios: <span class="mono">a₁/a₂ = b₁/b₂ ≠ c₁/c₂</span> means no solution.</p>
+      </div>
+      <div class="card">
+        <h3>The discriminant</h3>
+        <div class="ex">
+          <div><span class="a">b² − 4ac</span></div>
+          <div>&gt; 0 → two real solutions</div>
+          <div>= 0 → exactly one</div>
+          <div>&lt; 0 → none</div>
+        </div>
+        <p style="margin-top:11px">This is how nearly every "exactly one solution" question is constructed. Recognise it and the question is one line long.</p>
+      </div>
+      <div class="card">
+        <h3>Three forms of a quadratic</h3>
+        <div class="ex">
+          <div><span class="a">ax² + bx + c</span> → y-intercept</div>
+          <div><span class="a">a(x − p)(x − q)</span> → roots</div>
+          <div><span class="a">a(x − h)² + k</span> → vertex</div>
+        </div>
+        <p style="margin-top:11px">The question tells you which form you want. Vertex also at <span class="mono">x = −b/2a</span>.</p>
+      </div>
+      <div class="card">
+        <h3>Exponential models</h3>
+        <div class="ex">
+          <div>growth <span class="a">y = a(1 + r)ᵗ</span></div>
+          <div>decay <span class="a">y = a(1 − r)ᵗ</span></div>
+        </div>
+        <p style="margin-top:11px"><span class="mono">a</span> is the initial value. <b>The trap is the time unit</b> — a rate given per year with <span class="mono">t</span> measured in months, or halving expressed as a percentage.</p>
+      </div>
+      <div class="card">
+        <h3>Function notation &amp; transformations</h3>
+        <div class="ex">
+          <div><span class="a">f(x) + k</span> → up k</div>
+          <div><span class="a">f(x + k)</span> → left k</div>
+          <div><span class="a">−f(x)</span> → flip over x-axis</div>
+          <div><span class="a">f(−x)</span> → flip over y-axis</div>
+        </div>
+        <p style="margin-top:11px"><span class="mono">f(a) = b</span> simply means the graph passes through <span class="mono">(a, b)</span>.</p>
+      </div>
+      <div class="card">
+        <h3>Radicals &amp; rationals</h3>
+        <ul class="tick">
+          <li><b>Always check for extraneous solutions</b> after squaring both sides<small>The SAT includes the extraneous root among the choices</small></li>
+          <li>A rational equation excludes any value making a denominator zero</li>
+          <li><b>Equivalent expressions must be done by hand</b> — factor, expand, difference of squares. Desmos cannot help here</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-eyebrow="Problem-Solving &amp; Data Analysis · 5–7 Q">
+  <div class="inner">
+    <div class="kicker">Data &amp; statistics · ~15%</div>
+    <h1 class="stitle">The gap here is vocabulary, not arithmetic.</h1>
+    <p class="sub">Every question in this domain is arithmetically trivial. They are missed because a statistical term means something specific that the everyday word does not.</p>
+    <div class="cards c3">
+      <div class="card">
+        <h3>Percentages</h3>
+        <div class="ex"><div>percent change = <span class="a">(new − old) / old</span></div></div>
+        <ul class="tick">
+          <li><b>"Percent of" ≠ "percent more than"</b><small>120% of 50 is 60; 120% more than 50 is 110</small></li>
+          <li>A 20% rise followed by a 20% fall does not return to the start</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Rates and units</h3>
+        <p>Write the unit fraction and cancel explicitly. Most errors in this domain are <b>unit errors, not calculation errors</b> — minutes against hours, cm against m, per item against per batch.</p>
+        <p>Underline the unit the question asks for before you begin.</p>
+      </div>
+      <div class="card">
+        <h3>Centre and spread</h3>
+        <ul class="tick">
+          <li><b>Mean moves with outliers; median does not</b><small>Adding one very large value: mean rises, median barely shifts</small></li>
+          <li><b>Standard deviation = clustering.</b> Comparing two sets, the more spread out one has the larger SD</li>
+          <li>Range and standard deviation answer different questions</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Two-variable data</h3>
+        <p>Read predictions off the <b>line of best fit</b>, not off the nearest data point. A common question compares what the model predicts against what was actually observed.</p>
+      </div>
+      <div class="card">
+        <h3>Probability</h3>
+        <p>Almost always read from a two-way table. <b>The denominator is whatever the question restricts you to</b> — "given that the student is in Year 2" means the Year 2 total, not the grand total.</p>
+      </div>
+      <div class="card">
+        <h3>Inference &amp; study design</h3>
+        <ul class="tick">
+          <li>A <b>larger sample narrows</b> the margin of error</li>
+          <li>Conclusions extend only to the population actually sampled</li>
+          <li><b>Random selection</b> → you may generalise. <b>Random assignment</b> → you may claim cause. Only both permits a causal claim about a wider group</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-eyebrow="Geometry &amp; Trigonometry · 5–7 Q">
+  <div class="inner">
+    <div class="kicker">Geometry &amp; trigonometry · ~15%</div>
+    <h1 class="stitle">Know what the reference sheet doesn't give you.</h1>
+    <div class="cards c2">
+      <div class="card">
+        <h3>Provided on screen — don't memorise</h3>
+        <ul class="tick">
+          <li>Circle area and circumference; rectangle and triangle area</li>
+          <li>Pythagoras</li>
+          <li>Special right triangles<small>30-60-90 → x, x√3, 2x &nbsp;·&nbsp; 45-45-90 → x, x, x√2</small></li>
+          <li>Volumes: prism, cylinder, sphere, cone, pyramid</li>
+          <li>360° in a circle, 2π radians, 180° in a triangle</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Not provided — memorise these</h3>
+        <div class="ex">
+          <div><span class="a">SOH CAH TOA</span></div>
+          <div><span class="a">sin(x°) = cos(90° − x°)</span></div>
+          <div>circle: <span class="a">(x−h)² + (y−k)² = r²</span></div>
+          <div>arc length = <span class="a">(θ/360) · 2πr</span></div>
+          <div>sector area = <span class="a">(θ/360) · πr²</span></div>
+          <div>radians = <span class="a">degrees × π/180</span></div>
+          <div>inscribed angle = <span class="a">½ × central angle</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="cards c3">
+      <div class="card">
+        <h3>Similar triangles</h3>
+        <p>The most-used tool that the question will never name. Parallel lines and shared angles create similar triangles; set up the ratio of corresponding sides and solve.</p>
+      </div>
+      <div class="card">
+        <h3>Draw it</h3>
+        <p>When no figure is given, draw one and label <b>every</b> value stated before starting. Geometry questions without a diagram are missed at several times the rate of ones with.</p>
+      </div>
+      <div class="card">
+        <h3>Figures are not to scale</h3>
+        <p>Unless explicitly stated. Never measure or estimate from the picture — but do use it to keep track of what you have worked out.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-eyebrow="Grid-ins and the careless-error audit">
+  <div class="inner">
+    <div class="kicker">Mechanics · ~11 grid-ins per test</div>
+    <h1 class="stitle">Free points, lost to formatting.</h1>
+    <div class="cards c2">
+      <div class="card">
+        <h3>Student-produced response rules</h3>
+        <ul class="tick">
+          <li><b>5 characters</b> maximum for a positive answer, <b>6</b> including the sign for a negative</li>
+          <li>Fractions accepted; improper fractions are fine<small><b>Mixed numbers are not.</b> Enter 7/2 or 3.5 — never 3 1/2</small></li>
+          <li>No commas in numbers above 999. No % sign, no $ sign, no units</li>
+          <li><b>A decimal must fill the available space</b><small>2/3 is entered as .6666 or .6667 — never .67</small></li>
+          <li>If more than one value is correct, enter only one of them</li>
+        </ul>
+        <div class="ex">
+          <div><span class="y">✓</span> 3.5 &nbsp; 7/2 &nbsp; −12 &nbsp; .6667 &nbsp; 1250</div>
+          <div><span class="n">✗</span> 3 1/2 &nbsp; 1,250 &nbsp; 45% &nbsp; $18 &nbsp; .67</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>The careless-error audit</h3>
+        <p>Content isn't the gap, so the error log tags <b>causes</b>, not topics. Every practice miss gets exactly one tag:</p>
+        <div class="ex">
+          <div><span class="a">wrong quantity</span> — solved for x, wanted 2x</div>
+          <div><span class="a">unit mismatch</span> — minutes vs hours</div>
+          <div><span class="a">sign error</span></div>
+          <div><span class="a">misread</span> — not / least / except</div>
+          <div><span class="a">transcription</span> — copied a term wrong</div>
+          <div><span class="a">grid-in format</span></div>
+        </div>
+        <p style="margin-top:11px">Whichever tag repeats becomes a written checking rule you apply before submitting every answer. <b>That rule is the entire Math prep plan.</b></p>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">Timing</span>
+      Target <b>28 minutes</b> for the 22 questions, leaving <b>7 minutes</b> to revisit everything flagged. No question takes more than three minutes on the first pass. Then spend the reserve re-reading question stems, not redoing arithmetic — the wrong-quantity error is caught by re-reading, never by recalculating.
+    </div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-eyebrow="Protocol · 20 Aug to 12 Sep">
+  <div class="inner">
+    <div class="kicker">Three weeks</div>
+    <h1 class="stitle">The protocol to 12 September.</h1>
+    <p class="sub">Roughly 1½ hours a day on this section alongside the Reading &amp; Writing track — less time, because the content is already there. The work is precision and tooling.</p>
+    <ol class="seq">
+      <li><b>20–21 Aug · Baseline</b><span>Bluebook Practice Test 4, full length, timed, cold. Tag every Math miss with a cause, not a topic.</span></li>
+      <li class="big"><b>22–28 Aug · Desmos to fluency + algebra under time</b><span>All six Desmos moves until they are reflex — this is the single highest-return block. Alongside: 30 hard Question Bank items daily across Algebra and Advanced Math, every miss tagged.</span></li>
+      <li><b>29 Aug · Practice Test 6</b><span>First real check on whether the Desmos work has converted into time saved.</span></li>
+      <li><b>30 Aug – 4 Sep · The two small domains</b><span>Data &amp; statistics vocabulary and the not-on-the-reference-sheet formulas, to memory. Plus 20 grid-in format drills a day — pure mechanics.</span></li>
+      <li><b>5 Sep · Practice Test 8</b></li>
+      <li class="big"><b>6–8 Sep · No new material</b><span>Re-attempt every logged error. Whichever careless tag dominates gets a written checking rule that you then apply on every remaining practice question.</span></li>
+      <li><b>9 Sep · Practice Test 11 — final</b><span>Three days out, and the test that most closely reflects current administrations — so the last signal before the sitting is also the most predictive one.</span></li>
+      <li><b>10–11 Sep · Taper</b><span>Bluebook exam setup completed, admission ticket printed, passport in the bag, device charged. Friday: nothing.</span></li>
+    </ol>
+    <div class="call">
+      <span class="lbl">The measure of success</span>
+      Not questions attempted, and not topics revised. <b>The number of distinct careless-error causes still appearing in the log by 8 September.</b> Drive that to zero and 780+ follows.
+    </div>
+  </div>
+</section>
+
+</main>
+
+<nav class="nav">
+  <button class="nbtn" id="prev" aria-label="Previous slide">←</button>
+  <div class="dots" id="dots"></div>
+  <button class="nbtn" id="next" aria-label="Next slide">→</button>
+  <span class="hint">← → to navigate</span>
+</nav>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var dots=document.getElementById('dots'), i=0;
+  document.getElementById('tot').textContent=slides.length;
+  slides.forEach(function(s,n){
+    var b=document.createElement('button');
+    b.className='dot'; b.setAttribute('aria-label','Slide '+(n+1));
+    b.addEventListener('click',function(){go(n)});
+    dots.appendChild(b);
+  });
+  function go(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i); if(k===i)s.scrollTop=0;});
+    [].slice.call(dots.children).forEach(function(d,k){d.classList.toggle('on',k===i)});
+    document.getElementById('cur').textContent=i+1;
+    document.getElementById('eyebrow').textContent=slides[i].getAttribute('data-eyebrow')||'';
+    document.getElementById('progbar').style.width=((i+1)/slides.length*100)+'%';
+    document.getElementById('prev').disabled=(i===0);
+    document.getElementById('next').disabled=(i===slides.length-1);
+    history.replaceState(null,'','#'+(i+1));
+  }
+  document.getElementById('prev').addEventListener('click',function(){go(i-1)});
+  document.getElementById('next').addEventListener('click',function(){go(i+1)});
+  window.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();go(i+1)}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1)}
+    else if(e.key==='Home'){e.preventDefault();go(0)}
+    else if(e.key==='End'){e.preventDefault();go(slides.length-1)}
+  });
+  document.getElementById('theme').addEventListener('click',function(){
+    var cur=document.documentElement.getAttribute('data-theme');
+    var sys=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+    var now=cur||sys;
+    document.documentElement.setAttribute('data-theme', now==='dark'?'light':'dark');
+  });
+  window.addEventListener('hashchange',function(){
+    var n=(parseInt(location.hash.slice(1),10)||1)-1;
+    if(n!==i) go(n);
+  });
+  go((parseInt(location.hash.slice(1),10)||1)-1);
+})();
+</script>
+</body>
+</html>

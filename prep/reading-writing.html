@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reading &amp; Writing Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --ground:#F1F2EF; --surface:#FCFCFA; --raise:#E8EAE5;
+  --ink:#14181A; --muted:#6A747A; --line:#D5D8D1;
+  --accent:#9B2C3E; --accent-soft:#9B2C3E14; --on-accent:#FCFCFA;
+  --warn:#8A6100; --good:#2F6B3A;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1113; --surface:#161A1C; --raise:#1E2326;
+    --ink:#E9EBE6; --muted:#8D979C; --line:#282E32;
+    --accent:#F0899A; --accent-soft:#F0899A1F; --on-accent:#0E1113;
+    --warn:#E0B45E; --good:#7FC98F;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1113; --surface:#161A1C; --raise:#1E2326;
+  --ink:#E9EBE6; --muted:#8D979C; --line:#282E32;
+  --accent:#F0899A; --accent-soft:#F0899A1F; --on-accent:#0E1113;
+  --warn:#E0B45E; --good:#7FC98F;
+}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body);
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;overflow:hidden}
+h1,h2,h3,h4{font-family:var(--f-display);font-weight:600;margin:0;text-wrap:balance}
+.mono{font-family:var(--f-mono)}
+
+/* rail */
+.rail{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:11px 26px;background:var(--surface);border-bottom:1px solid var(--line)}
+.rail-l{display:flex;align-items:baseline;gap:11px;min-width:0}
+.tag{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--on-accent);background:var(--accent);padding:3px 7px;border-radius:2px}
+.deckname{font-family:var(--f-display);font-weight:700;font-size:14px;letter-spacing:-.01em;white-space:nowrap}
+.rail-r{display:flex;align-items:center;gap:14px}
+#eyebrow{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+.count{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.count b{color:var(--ink);font-weight:500}
+.tbtn,.hbtn{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  background:none;border:1px solid var(--line);color:var(--muted);padding:4px 8px;cursor:pointer;border-radius:2px;text-decoration:none}
+.tbtn:hover,.hbtn:hover{color:var(--ink);border-color:var(--muted)}
+.tbtn:focus-visible,.hbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.prog{flex:0 0 auto;height:2px;background:var(--line)}
+.prog i{display:block;height:100%;background:var(--accent);width:0;transition:width .22s ease}
+
+/* stage */
+#stage{flex:1 1 auto;overflow:hidden;display:flex}
+.slide{display:none;width:100%;overflow-y:auto;padding:34px 26px 26px}
+.slide.on{display:block}
+.inner{max-width:1180px;margin:0 auto}
+.stitle{font-size:clamp(25px,3.4vw,38px);letter-spacing:-.025em;line-height:1.05;max-width:22ch}
+.sub{color:var(--muted);margin:12px 0 0;max-width:76ch;font-size:16px}
+.kicker{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:11px}
+
+/* strips */
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);margin-top:24px}
+.strip div{background:var(--surface);padding:12px 14px}
+.strip .k{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.strip .v{font-family:var(--f-display);font-weight:600;font-size:19px;margin-top:5px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+
+/* cards */
+.cards{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:24px}
+.c2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.c3{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+.card{background:var(--surface);padding:16px 18px 18px}
+.card>h3{font-size:15px;letter-spacing:-.01em}
+.card>h3 em{font-style:normal;font-family:var(--f-mono);font-size:11px;color:var(--muted);font-weight:400;margin-left:7px;letter-spacing:.05em}
+.card p{margin:9px 0 0}
+.card p+p{margin-top:7px}
+ul.tick{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+ul.tick li{padding-left:15px;position:relative;line-height:1.42}
+ul.tick li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:1px;background:var(--accent)}
+ul.tick li b{font-weight:600}
+ul.tick li small{display:block;color:var(--muted);font-size:13.5px;line-height:1.4}
+
+/* numbered sequence */
+ol.seq{margin:22px 0 0;padding:0;list-style:none;counter-reset:s;display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
+ol.seq li{background:var(--surface);padding:12px 16px 13px 52px;position:relative;counter-increment:s}
+ol.seq li::before{content:counter(s,decimal-leading-zero);position:absolute;left:16px;top:13px;
+  font-family:var(--f-mono);font-size:11px;color:var(--accent);letter-spacing:.05em}
+ol.seq li b{font-family:var(--f-display);font-weight:600;font-size:14px;display:block;letter-spacing:-.01em}
+ol.seq li span{color:var(--muted);display:block;margin-top:3px;font-size:14.5px}
+ol.seq li.big{background:var(--accent-soft)}
+
+/* tables */
+.tw{overflow-x:auto;margin-top:24px;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;min-width:620px;background:var(--surface)}
+th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14.5px}
+th{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--raise)}
+tbody tr:last-child td{border-bottom:none}
+td.m{font-family:var(--f-mono);font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.d{font-family:var(--f-display);font-weight:600;font-size:14px}
+.good{color:var(--good)} .warn{color:var(--warn)} .acc{color:var(--accent)}
+
+/* mono examples */
+.ex{font-family:var(--f-mono);font-size:12px;line-height:1.7;background:var(--raise);
+  border:1px solid var(--line);padding:10px 12px;margin-top:10px;overflow-x:auto}
+.ex .y{color:var(--good)} .ex .n{color:var(--accent)}
+.ex div{white-space:nowrap}
+
+/* callout */
+.call{margin-top:24px;background:var(--accent-soft);border:1px solid var(--line);border-left:2px solid var(--accent);padding:14px 18px}
+.call b{font-weight:600}
+.call .lbl{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:6px}
+
+/* nav */
+.nav{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:18px;
+  padding:10px 26px;border-top:1px solid var(--line);background:var(--surface)}
+.nbtn{font-family:var(--f-mono);font-size:14px;background:none;border:1px solid var(--line);color:var(--ink);
+  width:34px;height:28px;cursor:pointer;border-radius:2px;line-height:1}
+.nbtn:hover{border-color:var(--accent);color:var(--accent)}
+.nbtn:disabled{opacity:.3;cursor:default;border-color:var(--line);color:var(--muted)}
+.nbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dots{display:flex;gap:6px}
+.dot{width:22px;height:3px;background:var(--line);border:none;padding:0;cursor:pointer;border-radius:1px}
+.dot:hover{background:var(--muted)}
+.dot.on{background:var(--accent)}
+.dot:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.hint{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;color:var(--muted);position:absolute;right:26px}
+.nav{position:relative}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:720px){
+  .slide{padding:22px 16px} .rail{padding:9px 14px} .nav{padding:9px 14px} .hint{display:none}
+  #eyebrow{display:none} table{min-width:520px}
+}
+</style>
+</head>
+<body>
+
+<div class="rail">
+  <div class="rail-l">
+    <span class="tag">Section I</span>
+    <span class="deckname">Reading &amp; Writing Playbook</span>
+  </div>
+  <div class="rail-r">
+    <span id="eyebrow"></span>
+    <span class="count"><b id="cur">1</b> / <span id="tot">9</span></span>
+    <a class="hbtn" href="index.html">Syllabus</a>
+    <button class="tbtn" id="theme">Theme</button>
+  </div>
+</div>
+<div class="prog"><i id="progbar"></i></div>
+
+<main id="stage">
+
+<!-- 1 -->
+<section class="slide" data-eyebrow="Overview · the shape of the section">
+  <div class="inner">
+    <div class="kicker">Overview</div>
+    <h1 class="stitle">Two modules, and 71 seconds a question.</h1>
+    <p class="sub">Every question carries its own passage of 25–150 words. There are no long shared passages, no memory load between questions, and no reason to read anything twice.</p>
+    <div class="strip">
+      <div><div class="k">Questions</div><div class="v">54</div></div>
+      <div><div class="k">Time</div><div class="v">64 min</div></div>
+      <div><div class="k">Structure</div><div class="v">2 × 27</div></div>
+      <div><div class="k">Per module</div><div class="v">32 min</div></div>
+      <div><div class="k">Per question</div><div class="v">~71 s</div></div>
+      <div><div class="k">Passage length</div><div class="v">25–150 w</div></div>
+    </div>
+    <div class="cards c3">
+      <div class="card">
+        <h3>Module 1 is the gate</h3>
+        <p>Accuracy on the first module decides whether the second is the harder form — and <b>only the harder form reaches the top of the scale</b>.</p>
+        <p>So never rush Module 1 to bank time. It is not a warm-up.</p>
+      </div>
+      <div class="card">
+        <h3>The order never changes</h3>
+        <p>Domains appear in the same sequence on every test: Craft &amp; Structure → Information &amp; Ideas → Conventions → Expression of Ideas.</p>
+        <p>Within a domain, easiest to hardest. Conventions is the exception — sorted by difficulty alone, sub-types mixed.</p>
+      </div>
+      <div class="card">
+        <h3>Never leave a blank</h3>
+        <p>No negative marking. An unanswered question is a guaranteed zero; a guess is a free 25%.</p>
+        <p>Flag, guess, move. Return only if time remains.</p>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">What this predictability buys you</span>
+      Knowing exactly where the grammar block sits inside the module means you can <b>budget the clock before the test starts</b> — spend 4 minutes on the seven Conventions questions and hand the surplus to Cross-Text Connections, which is where the section is actually decided.
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-eyebrow="Domain map · where the points are">
+  <div class="inner">
+    <div class="kicker">Domain map</div>
+    <h1 class="stitle">Forty per cent of this section is rule-based.</h1>
+    <p class="sub">Reading comprehension moves over months. Rules move over days. With three weeks, the sequence of attack is not a preference — it is arithmetic.</p>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Domain</th><th>Q</th><th>Share</th><th>What it actually tests</th><th>Movable in 3 weeks</th></tr></thead>
+        <tbody>
+          <tr><td class="d">Standard English Conventions</td><td class="m">11–15</td><td class="m">26%</td><td>A finite, closed set of punctuation and grammar rules</td><td class="d good">Highest</td></tr>
+          <tr><td class="d">Expression of Ideas</td><td class="m">8–12</td><td class="m">20%</td><td>Two mechanical procedures — transitions, synthesis</td><td class="d good">High</td></tr>
+          <tr><td class="d">Craft and Structure</td><td class="m">13–15</td><td class="m">28%</td><td>Word choice, function of a passage, two-text comparison</td><td class="d">Medium</td></tr>
+          <tr><td class="d">Information and Ideas</td><td class="m">12–14</td><td class="m">26%</td><td>Main idea, evidence, inference — underlying reading speed</td><td class="d warn">Lowest</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="cards c2">
+      <div class="card">
+        <h3>Order of attack</h3>
+        <ul class="tick">
+          <li><b>Week 1 —</b> Conventions and Expression, to automatic<small>~23 questions, roughly 46% of the section, all governed by rules that fit on two slides</small></li>
+          <li><b>Week 2 —</b> Craft &amp; Structure and Information &amp; Ideas<small>Method work: predict before looking, name the function, test the claim</small></li>
+          <li><b>Week 3 —</b> Nothing new. Convert logged errors.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>The realistic arithmetic</h3>
+        <p>Taking Conventions and Expression from roughly two-thirds correct to near-perfect is about <b>7–8 questions</b>. On the Reading &amp; Writing scale that is worth in the region of <b>60–80 points</b>, from rules alone.</p>
+        <p>The same three weeks spent on inference questions would move almost nothing. This is the whole argument for the sequence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-eyebrow="Conventions I · boundaries">
+  <div class="inner">
+    <div class="kicker">Standard English Conventions · part one</div>
+    <h1 class="stitle">Boundaries: one question, asked every time.</h1>
+    <p class="sub">Ignore what sounds right. Look at what sits on each side of the punctuation mark, and label it independent or dependent. Every boundary question collapses once you do.</p>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Join</th><th>Punctuation</th><th>Rule</th></tr></thead>
+        <tbody>
+          <tr><td class="m">IND · IND</td><td class="d">. or ;</td><td>Always legal. Two complete sentences may always be separated by a period or a semicolon.</td></tr>
+          <tr><td class="m">IND · IND</td><td class="d">, + FANBOYS</td><td>Comma plus <span class="mono">for, and, nor, but, or, yet, so</span>. The comma alone is never enough.</td></tr>
+          <tr><td class="m">IND · anything</td><td class="d">:</td><td>The left side must be a complete sentence. The right side explains, lists or specifies it.</td></tr>
+          <tr><td class="m">DEP · IND</td><td class="d">,</td><td>A lead-in clause or phrase takes a comma before the main sentence starts.</td></tr>
+          <tr><td class="m acc">IND , IND</td><td class="d acc">✗ never</td><td><b>The comma splice.</b> The single most common wrong answer on the test.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="cards c2">
+      <div class="card">
+        <h3>Supplements <em>non-essential information</em></h3>
+        <p>Extra information is fenced by a <b>matched pair</b> — two commas, two dashes or two brackets. Never mix one with another.</p>
+        <p>Test: delete everything between the fences. What remains must still be a complete, sensible sentence.</p>
+        <div class="ex">
+          <div><span class="y">✓</span> The paper, published in 1972, was ignored.</div>
+          <div><span class="y">✓</span> The paper — published in 1972 — was ignored.</div>
+          <div><span class="n">✗</span> The paper, published in 1972 — was ignored.</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Essential vs non-essential</h3>
+        <p>No commas around information that identifies <b>which one</b> you mean. Commas around information that merely adds colour.</p>
+        <div class="ex">
+          <div><span class="y">✓</span> The scientist who found it won.</div>
+          <div><span class="y">✓</span> Marie Curie, who found it, won.</div>
+        </div>
+        <p style="margin-top:11px">In the first, the clause is doing identifying work — remove it and you no longer know which scientist. In the second, the name has already identified her.</p>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">Elimination hack</span>
+      If two answer choices are <b>grammatically equivalent</b> — a period and a semicolon between the same two clauses, say — then neither can be correct. A question cannot have two right answers. This alone kills two of four choices on a good number of boundary items.
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-eyebrow="Conventions II · form, structure and sense">
+  <div class="inner">
+    <div class="kicker">Standard English Conventions · part two</div>
+    <h1 class="stitle">Six rules cover almost everything else.</h1>
+    <div class="cards c3">
+      <div class="card">
+        <h3>1 · Subject–verb agreement</h3>
+        <p>Find the <b>true</b> subject. Mentally delete every prepositional phrase and clause sitting between it and the verb — they are placed there deliberately.</p>
+        <div class="ex">
+          <div>The <span class="y">set</span> of samples <span class="y">was</span> tested.</div>
+          <div>The <span class="y">results</span>, despite the delay, <span class="y">were</span> clear.</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>2 · Pronouns</h3>
+        <p>Number must match the antecedent, and the antecedent must be unambiguous.</p>
+        <div class="ex">
+          <div><span class="y">its</span> = belonging to it</div>
+          <div><span class="n">it's</span> = it is</div>
+          <div><span class="y">who</span> = subject &nbsp; <span class="y">whom</span> = object</div>
+          <div><span class="y">their / there / they're</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>3 · Verb tense</h3>
+        <p>The passage sets a timeline; the verb must sit on it. Look outside the underlined portion for the tense already established.</p>
+        <p>Sequences must stay consistent — a narrative that begins in the past does not drift into the present without a reason on the page.</p>
+      </div>
+      <div class="card">
+        <h3>4 · Modifiers</h3>
+        <p>The noun immediately after an opening descriptive phrase must be <b>the thing being described</b>. This is a rule about word order, not meaning.</p>
+        <div class="ex">
+          <div><span class="y">✓</span> Founded in 1887, the museum grew.</div>
+          <div><span class="n">✗</span> Founded in 1887, visitors flocked.</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>5 · Parallel structure</h3>
+        <p>Items in a list or a comparison share grammatical form — all nouns, all <span class="mono">-ing</span>, all infinitives.</p>
+        <div class="ex">
+          <div><span class="y">✓</span> reading, writing and editing</div>
+          <div><span class="n">✗</span> reading, writing and to edit</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>6 · Apostrophes</h3>
+        <div class="ex">
+          <div><span class="y">students</span> — more than one</div>
+          <div><span class="y">student's</span> — belonging to one</div>
+          <div><span class="y">students'</span> — belonging to several</div>
+          <div><span class="n">its'</span> — never exists</div>
+        </div>
+        <p style="margin-top:11px">Possessive pronouns — <span class="mono">its, hers, theirs, yours, ours</span> — never take an apostrophe.</p>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">Time discipline</span>
+      A Conventions question should take <b>30–40 seconds</b>. If one is taking longer, you are reading for meaning instead of testing a rule. Every second saved here funds Cross-Text Connections later in the module.
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-eyebrow="Expression of Ideas · transitions and synthesis">
+  <div class="inner">
+    <div class="kicker">Expression of Ideas · 8–12 Q</div>
+    <h1 class="stitle">Two question types. Both mechanical, both routinely fumbled.</h1>
+    <div class="cards c2">
+      <div class="card">
+        <h3>Transitions <em>~5–8 Q</em></h3>
+        <p><b>Cover the answer choices.</b> Read the sentence before and the sentence after. Name the relationship in your own word — then, and only then, look for the choice that matches it.</p>
+        <p>Reading the options first is exactly how a plausible-sounding wrong answer talks you into it. Every wrong choice is a real transition word used correctly for a relationship that isn't there.</p>
+        <div class="ex">
+          <div><span class="y">add</span> &nbsp; furthermore · moreover · in addition</div>
+          <div><span class="y">contrast</span> &nbsp; however · nevertheless · by contrast · still</div>
+          <div><span class="y">cause</span> &nbsp; therefore · consequently · thus · as a result</div>
+          <div><span class="y">example</span> &nbsp; for instance · specifically · namely</div>
+          <div><span class="y">sequence</span> &nbsp; subsequently · meanwhile · then</div>
+          <div><span class="y">concede</span> &nbsp; admittedly · granted · to be sure</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Rhetorical Synthesis <em>~3–5 Q</em></h3>
+        <p><b>Read the goal in the question stem first — before the bulleted notes.</b> The goal is the entire question. The notes are only raw material.</p>
+        <p>Typical goals: <span class="mono">emphasise a similarity</span>, <span class="mono">introduce X to an unfamiliar reader</span>, <span class="mono">present the second study's finding</span>.</p>
+        <ul class="tick">
+          <li>The right answer does <b>exactly</b> the stated goal — no more<small>Doing the goal plus something extra is a wrong answer</small></li>
+          <li>It uses only facts present in the notes<small>Anything added from outside is wrong however true</small></li>
+          <li>Wrong answers are accurate, fluent, and answer a different goal<small>This is why the stem must be read first — otherwise every choice looks fine</small></li>
+        </ul>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">Why this domain is worth the most per hour</span>
+      Neither question type requires understanding the subject matter. A transition question about mycorrhizal networks and one about Ming ceramics are <b>the same question</b>. Once the procedure is automatic, the content becomes irrelevant — which is not true anywhere else in the section.
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-eyebrow="Craft and Structure · 13–15 Q">
+  <div class="inner">
+    <div class="kicker">Craft and Structure · ~28%</div>
+    <h1 class="stitle">Predict first. Always. Without exception.</h1>
+    <p class="sub">Every question type in this domain has the same defence: form your own answer before reading theirs. The wrong choices are engineered to be attractive to a reader who arrives without one.</p>
+    <div class="cards c3">
+      <div class="card">
+        <h3>Words in Context <em>~6–8 Q</em></h3>
+        <p>Cover the choices. Read the sentence with a blank and <b>write your own word</b>. Then find the closest match.</p>
+        <ul class="tick">
+          <li>Traps are the <b>secondary meanings</b> of familiar words<small>"qualify" as in limit, "novel" as in new, "sound" as in valid</small></li>
+          <li>If two choices are near-synonyms, both are wrong<small>There can only be one answer</small></li>
+          <li>The sentence always contains the clue — a contrast word, a restatement, an example</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Text Structure &amp; Purpose <em>~3–4 Q</em></h3>
+        <p>Ask what the sentence <b>does</b>, not what it says. Answer in a verb before you look.</p>
+        <div class="ex">
+          <div>introduces · illustrates · qualifies</div>
+          <div>counters · concedes · concludes</div>
+          <div>defines · contextualises · complicates</div>
+        </div>
+        <p style="margin-top:11px">A choice that accurately summarises the content but names the wrong function is the standard wrong answer here.</p>
+      </div>
+      <div class="card">
+        <h3>Cross-Text Connections <em>~2 Q</em></h3>
+        <p>The hardest questions in the section, and worth the extra time.</p>
+        <p>Before looking at anything, write one line: <b>what would Author 2 say about Author 1's specific claim</b> — agree, disagree, extend, or qualify? Then find that line among the choices.</p>
+        <p>Budget <b>100+ seconds</b> each. This is what the Conventions surplus is for.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-eyebrow="Information and Ideas · 12–14 Q">
+  <div class="inner">
+    <div class="kicker">Information and Ideas · ~26%</div>
+    <h1 class="stitle">The answer must be forced by the text, not merely allowed by it.</h1>
+    <div class="cards c2">
+      <div class="card">
+        <h3>Central Ideas and Details <em>~3–4 Q</em></h3>
+        <p>The answer must cover <b>the whole passage</b>, not one true sentence inside it. A choice that is accurate about the second half only is the classic trap.</p>
+      </div>
+      <div class="card">
+        <h3>Inferences <em>~3–4 Q</em></h3>
+        <p>Usually phrased <span class="mono">"which most logically completes the text"</span>. Read the logical connective in the final sentence — <span class="mono">therefore</span>, <span class="mono">however</span>, <span class="mono">because</span> — it tells you the shape of what must follow.</p>
+        <p><b>If you have to add an assumption to make a choice work, it is wrong.</b> Consistent with the text is not the same as demanded by it.</p>
+      </div>
+      <div class="card">
+        <h3>Command of Evidence — Textual <em>~4–5 Q</em></h3>
+        <p>Name the exact claim to be supported, in your own words, first. Then test each quotation with one question: <b>does this make the claim more likely to be true?</b></p>
+        <p>Not "is this on the same topic". Relevance is the trap; support is the test.</p>
+      </div>
+      <div class="card">
+        <h3>Command of Evidence — Quantitative <em>~2–3 Q</em></h3>
+        <ul class="tick">
+          <li><b>Do not read the whole graph.</b> Read the claim, then find the single data point that decides it</li>
+          <li>Check axis labels and units before anything else<small>Thousands vs millions, percentage vs count — this is where the question is won or lost</small></li>
+          <li>Wrong answers describe the data correctly but do not support the stated claim</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call">
+      <span class="lbl">Expectation setting</span>
+      This is the domain that improves slowest, and three weeks will not transform it. The realistic goal here is <b>not losing points to method</b> — misreading what is being asked, choosing a true statement over a responsive one. The underlying comprehension gains come later, if there is a later.
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-eyebrow="Wrong answers and the clock">
+  <div class="inner">
+    <div class="kicker">Traps &amp; timing</div>
+    <h1 class="stitle">Every wrong answer is one of four things.</h1>
+    <div class="cards c2">
+      <div class="card">
+        <h3>1 · Half right</h3>
+        <p>The first clause is correct and the second is false. Students choose it because they stop reading once the opening matches. <b>Read to the end of every choice.</b></p>
+      </div>
+      <div class="card">
+        <h3>2 · True but not asked</h3>
+        <p>An accurate statement about the passage that does not answer the question. The defence is knowing precisely what was asked before you look at the options.</p>
+      </div>
+      <div class="card">
+        <h3>3 · Too extreme</h3>
+        <p><span class="mono">always · never · proves · all · must · impossible</span> — the SAT hedges. Right answers say <span class="mono">suggests</span>, <span class="mono">may</span>, <span class="mono">tends to</span>.</p>
+      </div>
+      <div class="card">
+        <h3>4 · Out of scope</h3>
+        <p>Plausible from general knowledge, absent from the text. If you cannot point to the line that supports it, it is not the answer.</p>
+      </div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Block within a module</th><th>Questions</th><th>Budget</th><th>Pace</th></tr></thead>
+        <tbody>
+          <tr><td class="d">Craft and Structure</td><td class="m">~7</td><td class="m">9 min</td><td>~75 s each; Cross-Text runs long, that's expected</td></tr>
+          <tr><td class="d">Information and Ideas</td><td class="m">~6</td><td class="m">8 min</td><td>~80 s each</td></tr>
+          <tr><td class="d">Standard English Conventions</td><td class="m">~7</td><td class="m good">4 min</td><td>~35 s each — this is the surplus</td></tr>
+          <tr><td class="d">Expression of Ideas</td><td class="m">~5</td><td class="m">6 min</td><td>~70 s each</td></tr>
+          <tr><td class="d">Reserve</td><td class="m">—</td><td class="m">5 min</td><td>Flagged questions and a final sweep for blanks</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="call">
+      <span class="lbl">The only hard rule</span>
+      <b>No question gets more than two minutes.</b> A single stubborn question costs three easier ones. Flag it, answer it anyway, move on.
+    </div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-eyebrow="Protocol · 20 Aug to 12 Sep">
+  <div class="inner">
+    <div class="kicker">Three weeks</div>
+    <h1 class="stitle">The protocol to 12 September.</h1>
+    <p class="sub">Roughly 2½ hours a day on this section, alongside the Math track. Bluebook, the official Question Bank and Khan Academy — nothing else.</p>
+    <ol class="seq">
+      <li><b>20–21 Aug · Baseline</b><span>Bluebook Practice Test 4, full length, timed, cold. Do not study first — a baseline you have prepared for tells you nothing.</span></li>
+      <li class="big"><b>22–28 Aug · Conventions and Expression only</b><span>All six grammar rules and the boundary table to automatic. 40 questions a day from the Question Bank, filtered to these two domains. Error log from the first question.</span></li>
+      <li><b>29 Aug · Practice Test 6</b><span>Full length, same start time as the real test. Check whether the rule work has landed before moving on.</span></li>
+      <li><b>30 Aug – 4 Sep · Craft &amp; Structure, Information &amp; Ideas</b><span>Predict-before-you-look on every single question. Khan Academy targeted practice generated from the Bluebook results.</span></li>
+      <li><b>5 Sep · Practice Test 8</b></li>
+      <li class="big"><b>6–8 Sep · No new material</b><span>Re-attempt every logged error from all three tests. This is the highest-value block in the three weeks and the one most likely to be skipped.</span></li>
+      <li><b>9 Sep · Practice Test 11 — final</b><span>Three days out, and the test that most closely reflects current administrations — so the last signal before the sitting is also the most predictive one. Late enough to be diagnostic, early enough to act on.</span></li>
+      <li><b>10–11 Sep · Taper</b><span>Bluebook exam setup completed, admission ticket printed, passport in the bag. Friday: nothing at all.</span></li>
+    </ol>
+    <div class="call">
+      <span class="lbl">Error log — the actual method</span>
+      <span class="mono" style="font-size:13px">question · domain · why missed (rule gap / misread / careless / timing) · redo date +48h</span><br><br>
+      Not a list of wrong answers — a list of <b>causes</b>. Whichever cause repeats is the prep plan. Volume of questions attempted is not the variable; volume of errors converted is.
+    </div>
+  </div>
+</section>
+
+</main>
+
+<nav class="nav">
+  <button class="nbtn" id="prev" aria-label="Previous slide">←</button>
+  <div class="dots" id="dots"></div>
+  <button class="nbtn" id="next" aria-label="Next slide">→</button>
+  <span class="hint">← → to navigate</span>
+</nav>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var dots=document.getElementById('dots'), i=0;
+  document.getElementById('tot').textContent=slides.length;
+  slides.forEach(function(s,n){
+    var b=document.createElement('button');
+    b.className='dot'; b.setAttribute('aria-label','Slide '+(n+1));
+    b.addEventListener('click',function(){go(n)});
+    dots.appendChild(b);
+  });
+  function go(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i); if(k===i)s.scrollTop=0;});
+    [].slice.call(dots.children).forEach(function(d,k){d.classList.toggle('on',k===i)});
+    document.getElementById('cur').textContent=i+1;
+    document.getElementById('eyebrow').textContent=slides[i].getAttribute('data-eyebrow')||'';
+    document.getElementById('progbar').style.width=((i+1)/slides.length*100)+'%';
+    document.getElementById('prev').disabled=(i===0);
+    document.getElementById('next').disabled=(i===slides.length-1);
+    history.replaceState(null,'','#'+(i+1));
+  }
+  document.getElementById('prev').addEventListener('click',function(){go(i-1)});
+  document.getElementById('next').addEventListener('click',function(){go(i+1)});
+  window.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();go(i+1)}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1)}
+    else if(e.key==='Home'){e.preventDefault();go(0)}
+    else if(e.key==='End'){e.preventDefault();go(slides.length-1)}
+  });
+  document.getElementById('theme').addEventListener('click',function(){
+    var cur=document.documentElement.getAttribute('data-theme');
+    var sys=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+    var now=cur||sys;
+    document.documentElement.setAttribute('data-theme', now==='dark'?'light':'dark');
+  });
+  window.addEventListener('hashchange',function(){
+    var n=(parseInt(location.hash.slice(1),10)||1)-1;
+    if(n!==i) go(n);
+  });
+  go((parseInt(location.hash.slice(1),10)||1)-1);
+})();
+</script>
+</body>
+</html>
